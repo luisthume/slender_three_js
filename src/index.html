@@ -78,7 +78,7 @@
 
 			var trees = [];
 			var papers = [];
-			let cameraBox;
+			let cameraBox, forestSound, stepSound;
 
 			// Save the current time
 			let prevTime = performance.now();
@@ -148,6 +148,7 @@
 				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0xffffff, 2, 0 );
 
+
 				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.5 );  // ( 0xeeeeff, 0x777788, 0.5 )
 				light.position.set( 0.5, 1, 0.75 );
 
@@ -167,12 +168,33 @@
 					instructions.style.display = 'none';
 					blocker.style.display = 'none';
 
+
+					// create an AudioListener and add it to the camera
+					const listener = new THREE.AudioListener();
+					camera.add( listener );
+
+					// create a global audio source
+					forestSound = new THREE.Audio( listener );
+
+					// load a sound and set it as the Audio object's buffer
+					const AudioLoader = new THREE.AudioLoader();
+					AudioLoader.load( 'sounds/forest.mp3', function( buffer ) {
+						forestSound.setBuffer( buffer );
+						forestSound.setLoop( true );
+						forestSound.setVolume( 0.35 );
+						forestSound.play();
+					});
+
+					// create a global audio source
+					stepSound = new THREE.Audio( listener );
+
 				} );
 
 				controls.addEventListener( 'unlock', function () {
 
 					blocker.style.display = 'block';
 					instructions.style.display = '';
+					forestSound.stop();
 
 				} );
 
@@ -257,6 +279,15 @@
 
 				document.addEventListener( 'keydown', onKeyDown, false );
 				document.addEventListener( 'keyup', onKeyUp, false );
+				
+
+				( 'unlock', function () {
+
+					blocker.style.display = 'block';
+					instructions.style.display = '';
+					forestSound.stop();
+
+					} );				
 
 				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );	
 
@@ -577,7 +608,7 @@
 						}
 
 						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveBackward === true) {
-							controls.moveForward(-1*((velocity.x * delta)));
+							controls.moveForward((velocity.x * delta));
 							velocity.x = 0
 							velocity.z = 0
 							console.log('Trás');
@@ -591,7 +622,7 @@
 						}
 
 						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveLeft === true) {
-							controls.moveForward(-1*((velocity.x * delta)));
+							controls.moveRight(-1*((velocity.x * delta)));
 							velocity.x = 0
 							velocity.x = 0
 							console.log('Esquerda');
@@ -604,6 +635,19 @@
 							papers.splice(papers.indexOf(papers[i]), 1);
 							console.log(papers.length)					
 						}
+					}
+				}
+
+				if(moveBackward || moveForward || moveLeft || moveRight) {
+					const AudioLoader = new THREE.AudioLoader();
+					if(stepSound.isPlaying === false) {
+					AudioLoader.load( 'sounds/step' + Math.floor(Math.random() * 2) + '.mp3', function( buffer ) {
+						console.log(Math.floor(Math.random() * 3))
+						stepSound.setBuffer( buffer );
+						stepSound.setLoop( false);
+						stepSound.setVolume( 0.2 );
+						stepSound.play();
+					});
 					}
 				}
 
