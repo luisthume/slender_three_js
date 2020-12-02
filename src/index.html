@@ -61,7 +61,7 @@
 		
 		<script type="module">
 			(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2;
 
 			const objects = [];
 
@@ -72,8 +72,9 @@
 			let moveLeft = false;
 			let moveRight = false;
 			let canJump = false;
-			
-			const geometries = [];
+
+			var trees = [];
+			let cameraBox;
 
 			// Save the current time
 			let prevTime = performance.now();
@@ -136,19 +137,15 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.6, 1000 );
 				camera.position.set(900, 10, 580);
+				camera.rotation.y = -5;
 				var cameraBox = new THREE.Box3().setFromObject( camera );
-				var collision = cameraBox.containsPoint( camera.position );
-				if (collision) {
-    					console.log('intersection');
-				}
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xffffff, 0, 250 );
+				scene.background = new THREE.Color( 0x000000 );
+				scene.fog = new THREE.Fog( 0xffffff, 2, 0 );
 
-				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.5 );
+				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.5 );  // ( 0xeeeeff, 0x777788, 0.5 )
 				light.position.set( 0.5, 1, 0.75 );
-				scene.add( light );
 
 				controls = new THREE.PointerLockControls( camera, document.body );
 
@@ -241,7 +238,7 @@
 				document.addEventListener( 'keydown', onKeyDown, false );
 				document.addEventListener( 'keyup', onKeyUp, false );
 
-				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );	
 
 				// floor
 
@@ -268,7 +265,7 @@
 				floorGeometry = floorGeometry.toNonIndexed(); 
 
 				const floor_texture = new THREE.TextureLoader().load( 'textures/grass1.jpg' );
-				const floorMaterial = new THREE.MeshBasicMaterial( { map : floor_texture } );
+				const floorMaterial = new THREE.MeshPhongMaterial( { map : floor_texture } );
 
 				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				scene.add( floor );
@@ -295,16 +292,17 @@
 							const box = new THREE.Box3();
 							box.setFromObject(cylinder);
 
-							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//const helper = new THREE.Box3Helper( box, 0xffff00 );
+							//scene.add( helper );
 
 							scene.add( cylinder );
 							objects.push( cylinder );
+							trees.push( box );
 						}
 						else if (coordinates[j] === 2) {
 							const planeGeometry = new THREE.PlaneGeometry( 80, 50)
 							const container_texture = new THREE.TextureLoader().load( 'textures/container.png' );			
-							const planeMaterial = new THREE.MeshBasicMaterial( {map: container_texture, side: THREE.DoubleSide} );
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: container_texture, side: THREE.DoubleSide} );
 							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
 
 							plane.position.x = i*20;
@@ -318,13 +316,14 @@
 							scene.add( helper );
 
 							scene.add( plane );	
-							objects.push( plane );							
+							objects.push( plane );
+							trees.push( box );						
 						}
 
 						else if (coordinates[j] === 3) {
 							const planeGeometry = new THREE.PlaneGeometry( 80, 40)
 							const container_texture = new THREE.TextureLoader().load( 'textures/container.png' );			
-							const planeMaterial = new THREE.MeshBasicMaterial( {map: container_texture, side: THREE.DoubleSide} );
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: container_texture, side: THREE.DoubleSide} );
 							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
 
 							plane.position.x = i*20;
@@ -339,13 +338,13 @@
 							scene.add( helper );
 
 							scene.add( plane );	
-							objects.push( plane );							
+							objects.push( plane );					
 						}
 
 						else if (coordinates[j] === 4) {
 							const boxGeometry = new THREE.BoxGeometry( 80, 40, 3)
 							const wall_texture = new THREE.TextureLoader().load( 'textures/wall.jpg' );			
-							const boxMaterial = new THREE.MeshBasicMaterial( {map: wall_texture, side: THREE.DoubleSide} );
+							const boxMaterial = new THREE.MeshPhongMaterial( {map: wall_texture, side: THREE.DoubleSide} );
 							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
 							box1.position.x = i*20;
@@ -358,13 +357,14 @@
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
 							scene.add( helper );
 							scene.add( box1 );	
-							objects.push( box1 );						
+							objects.push( box1 );
+							trees.push( box );					
 						}
 
 						else if (coordinates[j] === 5) {
 							const boxGeometry = new THREE.BoxGeometry( 80, 40, 3)
 							const wall_texture = new THREE.TextureLoader().load( 'textures/wall.jpg' );			
-							const boxMaterial = new THREE.MeshBasicMaterial( {map: wall_texture, side: THREE.DoubleSide} );
+							const boxMaterial = new THREE.MeshPhongMaterial( {map: wall_texture, side: THREE.DoubleSide} );
 							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
 							box1.position.x = i*20;
@@ -378,11 +378,42 @@
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
 							scene.add( helper );
 							scene.add( box1 );	
-							objects.push( box1 );							
+							objects.push( box1 );
+							trees.push( box );							
 						}
 
 					}
 				}
+
+				// flaslight
+
+				flashLight = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 7, 20), new THREE.MeshPhongMaterial({color:0x000000}));
+				flashLight.rotateX(Math.PI/2);
+				camera.add(flashLight);
+
+				spotLight1 = new THREE.SpotLight(0xcccccc, 0.5, 150);
+				spotLight1.power = 5;
+				spotLight1.angle = 0.5;
+				spotLight1.decay = 2;
+				spotLight1.penumbra = 0.1;
+				spotLight1.distance = 200;
+				spotLight1.castShadow = true;
+				spotLight1.rotateX(Math.PI/2);
+
+				spotLight2 = new THREE.SpotLight(0xcccccc, 0.5, 150);
+				spotLight2.power = 2;
+				spotLight2.angle = 0.6;
+				spotLight2.decay = 2;
+				spotLight2.penumbra = 0.1;
+				spotLight2.distance = 200;
+				spotLight2.castShadow = true;
+				spotLight2.rotateX(Math.PI/2);				
+
+
+				flashLight.add(spotLight1);
+				flashLight.add(spotLight1.target);				
+				flashLight.add(spotLight2);
+				flashLight.add(spotLight2.target);				
 
 				//
 
@@ -415,7 +446,7 @@
 				if ( controls.isLocked === true ) {
 
 					raycaster.ray.origin.copy( controls.getObject().position ); // localização
-					raycaster.ray.origin.y -= 10; // localização
+					raycaster.ray.origin.y += 10; // localização
 
 					const intersections = raycaster.intersectObjects( scene.children ); // objects
 
@@ -459,30 +490,59 @@
 
 						canJump = true;
 
-					}					
+					}		
+
+					for(var i = 0; i < trees.length; i++) {
+						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveForward === true) {
+							controls.moveForward(velocity.z * delta -0.25);
+							velocity.x = 0
+							velocity.z = 0
+							console.log('Frente');
+						}
+
+						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveBackward === true) {
+							controls.moveForward(-1*((velocity.x * delta) -0.25));
+							velocity.x = 0
+							velocity.z = 0
+							console.log('Trás');
+						}
+
+						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveRight === true) {
+							controls.moveRight(velocity.x * delta -0.25);
+							velocity.x = 0
+							velocity.x = 0
+							console.log('Direita');
+						}
+
+						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveLeft === true) {
+							controls.moveForward(-1*((velocity.x * delta) -0.25));
+							velocity.x = 0
+							velocity.x = 0
+							console.log('Esquerda');
+						}
+						if ( raycaster.ray.intersectsBox( trees[i] ) === true ){
+							moveForward === false
+							moveBackward === false
+							moveRight === false
+							moveLeft === false
+						}
+
+					}
 				}
 
+				const intersects = raycaster.intersectObjects(objects);
+				for(var i = 0; i < intersects.length; i++) {
+						intersects[ i ].object.material.color.set( 0xff0000 );
+						controls.getObject().position.x -= 0.00001
+					};
 
-				const intersects = raycaster.intersectObjects( objects);
-
-				for ( let i = 0; i < intersects.length; i ++ ) {
-
-					intersects[ i ].object.material.color.set( 0xff0000 );
-					//controls.moveBackward(-1 *  - velocity.z )
-					//controls.getObject().position.x = raycaster.ray.origin.x - 0.01
-					//controls.getObject().position.z = raycaster.ray.origin.z - 0.01
-					
-
-				}
-
-				
 
 				prevTime = time;
 
 				renderer.render( scene, camera );
 
-			}
 
+			}
 		</script>
 	</body>
 </html>
