@@ -58,7 +58,8 @@
 		<script src="js/three.js"></script>
 		<script src="js/three.module.js"></script>
 		<script src="js/PointerLockControls.js"></script>
-		
+		<script src="//unpkg.com/three-spritetext"></script>
+
 		<script type="module">
 			(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
 			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2;
@@ -76,6 +77,7 @@
 			let interact = false;
 
 			var trees = [];
+			var papers = [];
 			let cameraBox;
 
 			// Save the current time
@@ -124,10 +126,10 @@
 			[0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 1, 1, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
 
@@ -289,7 +291,6 @@
 				scene.add( floor );
 
 				// objects
-				
 
 
 				for ( let i = 0; i < coordArray.length; i++) {
@@ -387,7 +388,7 @@
 							box1.position.x = i*20;
 							box1.position.y = 20;
 							box1.position.z = j*20;
-							box1.rotateY(Math.PI / 2)
+							box1.rotateY(Math.PI / 2);
 							
 							const box = new THREE.Box3();
 							box.setFromObject(box1);
@@ -398,6 +399,24 @@
 							objects.push( box1 );
 							trees.push( box );							
 						}
+
+						else if (coordinates[j] === 6) {
+							const planeGeometry = new THREE.PlaneGeometry( 4, 2.5)
+							const paper_texture = new THREE.TextureLoader().load( 'textures/page1.png' );			
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
+							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
+
+							plane.position.x = i*20;
+							plane.position.y = 2;
+							plane.position.z = j*20;
+							plane.rotateX(Math.PI/2);
+
+							const box = new THREE.Box3();
+							box.setFromObject(plane);
+
+							scene.add( plane );	
+							papers.push(plane);
+						}						
 
 					}
 				}
@@ -540,14 +559,19 @@
 							console.log('Esquerda');
 						}
 					}
+
+					for(var i = 0; i < papers.length; i++) {
+						if ( raycaster.ray.origin.distanceTo(papers[i].position) <= 20 && interact === true) {
+							scene.remove(papers[i]);
+							papers.splice(papers.indexOf(papers[i]), 1);
+							console.log(papers.length)					
+						}
+					}
 				}
 
-				const intersects = raycaster.intersectObjects(objects);
-				for(var i = 0; i < intersects.length; i++) {
-						intersects[ i ].object.material.color.set( 0xff0000 );
-						controls.getObject().position.x -= 0.00001
-					};
-
+				if(papers.length <= 0) {
+					console.log('Acabou!')
+				};
 
 				prevTime = time;
 
