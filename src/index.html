@@ -72,6 +72,8 @@
 			let moveLeft = false;
 			let moveRight = false;
 			let canJump = false;
+			let run = false;
+			let interact = false;
 
 			var trees = [];
 			let cameraBox;
@@ -203,6 +205,14 @@
 							canJump = false;
 							break;
 
+						case 16: // shift
+							run = true;
+							break;
+
+						case 69: // e
+							interact = true;
+							break;
+
 					}
 
 				};
@@ -229,6 +239,14 @@
 						case 39: // right
 						case 68: // d
 							moveRight = false;
+							break;
+
+						case 16: // shift
+							run = false;
+							break;
+
+						case 69: // e
+							interact = false;
 							break;
 
 					}
@@ -278,7 +296,6 @@
 					var coordinates = coordArray[i]
 					
 					for(var j = 0; j < coordinates.length; j++) {
-						//console.log(coordinates[j])
 						if (coordinates[j] === 1) {
 							const cylinderGeometry = new THREE.CylinderBufferGeometry( 10, 10, 200 ).toNonIndexed();
 							const three_texture = new THREE.TextureLoader().load( 'textures/arvore.jpeg' );
@@ -455,8 +472,10 @@
 					const delta = ( time - prevTime ) / 1000;
 
 					// Set the velocity.x and velocity.z using the calculated time delta
-					velocity.x -= velocity.x * 5.0 * delta; //movement speed
-					velocity.z -= velocity.z * 5.0 * delta; //movement speed
+					let moveSpeed = 4.0;
+					if (run) moveSpeed = 2.0;
+					velocity.x -= velocity.x * moveSpeed * delta; //movement speed
+					velocity.z -= velocity.z * moveSpeed * delta; //movement speed
 
 					velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
@@ -494,39 +513,32 @@
 
 					for(var i = 0; i < trees.length; i++) {
 						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveForward === true) {
-							controls.moveForward(velocity.z * delta -0.25);
+							controls.moveForward(velocity.z * delta);
 							velocity.x = 0
 							velocity.z = 0
 							console.log('Frente');
 						}
 
 						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveBackward === true) {
-							controls.moveForward(-1*((velocity.x * delta) -0.25));
+							controls.moveForward(-1*((velocity.x * delta)));
 							velocity.x = 0
 							velocity.z = 0
 							console.log('Trás');
 						}
 
 						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveRight === true) {
-							controls.moveRight(velocity.x * delta -0.25);
+							controls.moveRight(velocity.x * delta);
 							velocity.x = 0
 							velocity.x = 0
 							console.log('Direita');
 						}
 
 						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveLeft === true) {
-							controls.moveForward(-1*((velocity.x * delta) -0.25));
+							controls.moveForward(-1*((velocity.x * delta)));
 							velocity.x = 0
 							velocity.x = 0
 							console.log('Esquerda');
 						}
-						if ( raycaster.ray.intersectsBox( trees[i] ) === true ){
-							moveForward === false
-							moveBackward === false
-							moveRight === false
-							moveLeft === false
-						}
-
 					}
 				}
 
