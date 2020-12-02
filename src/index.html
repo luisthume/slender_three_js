@@ -58,7 +58,8 @@
 		<script src="js/three.js"></script>
 		<script src="js/three.module.js"></script>
 		<script src="js/PointerLockControls.js"></script>
-		
+		<script src="//unpkg.com/three-spritetext"></script>
+
 		<script type="module">
 			(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
 			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2;
@@ -76,6 +77,7 @@
 			let interact = false;
 
 			var trees = [];
+			var papers = [];
 			let cameraBox;
 
 			// Save the current time
@@ -90,13 +92,13 @@
  			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 			[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1], 
+			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 1],
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1, 1, 1, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 2, 3, 2, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1], 
@@ -127,11 +129,11 @@
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
 
-
+			// 5, 4
 			init();
 			animate();
 
@@ -289,7 +291,6 @@
 				scene.add( floor );
 
 				// objects
-				
 
 
 				for ( let i = 0; i < coordArray.length; i++) {
@@ -303,7 +304,7 @@
 							const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
 
 							cylinder.position.x = i*20;
-							cylinder.position.y = 100;
+							cylinder.position.y = 95;
 							cylinder.position.z = j*20;
 							
 							const box = new THREE.Box3();
@@ -364,7 +365,7 @@
 							const boxMaterial = new THREE.MeshPhongMaterial( {map: wall_texture, side: THREE.DoubleSide} );
 							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
-							box1.position.x = i*20;
+							box1.position.x = i*20 - 20;
 							box1.position.y = 20;
 							box1.position.z = j*20;
 							
@@ -387,7 +388,7 @@
 							box1.position.x = i*20;
 							box1.position.y = 20;
 							box1.position.z = j*20;
-							box1.rotateY(Math.PI / 2)
+							box1.rotateY(Math.PI / 2);
 							
 							const box = new THREE.Box3();
 							box.setFromObject(box1);
@@ -398,6 +399,62 @@
 							objects.push( box1 );
 							trees.push( box );							
 						}
+
+						else if (coordinates[j] === 6) {
+							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
+							const paper_texture = new THREE.TextureLoader().load( 'textures/page1.jpeg' );
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
+							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
+
+							plane.position.x = i*20;
+							plane.position.y = 2;
+							plane.position.z = j*20;
+							plane.rotateX(Math.PI*3/2);
+
+							const box = new THREE.Box3();
+							box.setFromObject(plane);
+
+							scene.add( plane );	
+							papers.push(plane);
+						}
+
+						else if (coordinates[j] === 7) {
+							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
+							const paper_texture = new THREE.TextureLoader().load( 'textures/page2.jpeg' );
+							paper_texture.roation = Math.PI/2
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
+							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
+
+							plane.position.x = i*20-5;
+							plane.position.y = 10;
+							plane.position.z = j*20-18;
+							plane.rotateX(Math.PI*2);
+
+							const box = new THREE.Box3();
+							box.setFromObject(plane);
+
+							scene.add( plane );	
+							papers.push(plane);
+						}			
+
+						else if (coordinates[j] === 8) {
+							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
+							const paper_texture = new THREE.TextureLoader().load( 'textures/page3.jpeg' );			
+							paper_texture.roation = Math.PI/2
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
+							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
+
+							plane.position.x = i*20;
+							plane.position.y = 2;
+							plane.position.z = j*20;
+							plane.rotateX(Math.PI*3/2);
+
+							const box = new THREE.Box3();
+							box.setFromObject(plane);
+
+							scene.add( plane );	
+							papers.push(plane);
+						}																				
 
 					}
 				}
@@ -410,7 +467,7 @@
 
 				spotLight1 = new THREE.SpotLight(0xcccccc, 0.5, 150);
 				spotLight1.power = 5;
-				spotLight1.angle = 0.5;
+				spotLight1.angle = 0.55;
 				spotLight1.decay = 2;
 				spotLight1.penumbra = 0.1;
 				spotLight1.distance = 200;
@@ -418,8 +475,8 @@
 				spotLight1.rotateX(Math.PI/2);
 
 				spotLight2 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-				spotLight2.power = 2;
-				spotLight2.angle = 0.6;
+				spotLight2.power = 3;
+				spotLight2.angle = 0.65;
 				spotLight2.decay = 2;
 				spotLight2.penumbra = 0.1;
 				spotLight2.distance = 200;
@@ -540,14 +597,19 @@
 							console.log('Esquerda');
 						}
 					}
+
+					for(var i = 0; i < papers.length; i++) {
+						if ( raycaster.ray.origin.distanceTo(papers[i].position) <= 25 && interact === true) {
+							scene.remove(papers[i]);
+							papers.splice(papers.indexOf(papers[i]), 1);
+							console.log(papers.length)					
+						}
+					}
 				}
 
-				const intersects = raycaster.intersectObjects(objects);
-				for(var i = 0; i < intersects.length; i++) {
-						intersects[ i ].object.material.color.set( 0xff0000 );
-						controls.getObject().position.x -= 0.00001
-					};
-
+				if(papers.length <= 0) {
+					console.log('Acabou!')
+				};
 
 				prevTime = time;
 
