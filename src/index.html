@@ -445,6 +445,9 @@
 							const box = new THREE.Box3();
 							box.setFromObject(plane);
 
+
+                            const helper = new THREE.Box3Helper( box, 0xFF0B0B );
+							scene.add( helper );
 							scene.add( plane );	
 							papers.push(plane);
 						}
@@ -463,7 +466,9 @@
 
 							const box = new THREE.Box3();
 							box.setFromObject(plane);
-
+							
+                            const helper = new THREE.Box3Helper( box, 0xFF0B0B );
+							scene.add( helper );
 							scene.add( plane );	
 							papers.push(plane);
 						}			
