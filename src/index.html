@@ -58,11 +58,18 @@
 		<script src="js/three.js"></script>
 		<script src="js/three.module.js"></script>
 		<script src="js/PointerLockControls.js"></script>
-		<script src="//unpkg.com/three-spritetext"></script>
+		<script src="js/OBJLoader.js"></script>
+		<script src="js/BadTVShader.js"></script>
+		<script src="js/EffectComposer.js"></script>
+		<script src="js/ShaderPass.js"></script>
+		<script src="js/CopyShader.js"></script>
+		<script src="js/RenderPass.js"></script>
+		<script src="js/GlitchPass.js"></script>
+		<script src="js/DigitalGlitch.js"></script>
 
 		<script type="module">
 			(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
-			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2;
+			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2, slenderMan, origem;
 
 			const objects = [];
 
@@ -78,7 +85,8 @@
 
 			var trees = [];
 			var papers = [];
-			let cameraBox, forestSound, stepSound;
+			var slenders = [];
+			let cameraBox, forestSound, stepSound, slenderStaticSound, pageFlipSound;
 
 			// Save the current time
 			let prevTime = performance.now();
@@ -148,9 +156,9 @@
 				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0xffffff, 2, 0 );
 
-
 				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.5 );  // ( 0xeeeeff, 0x777788, 0.5 )
 				light.position.set( 0.5, 1, 0.75 );
+				//scene.add(light);
 
 				controls = new THREE.PointerLockControls( camera, document.body );
 
@@ -187,6 +195,8 @@
 
 					// create a global audio source
 					stepSound = new THREE.Audio( listener );
+					slenderStaticSound = new THREE.Audio( listener );
+					pageFlipSound = new THREE.Audio( listener );
 
 				} );
 
@@ -495,6 +505,46 @@
 					}
 				}
 
+				//slenderman
+
+				const SlenderLoader = new THREE.OBJLoader();
+
+				// load a resource
+				SlenderLoader.load(
+					// resource URL
+					'models/slenderman/SM Model.obj',
+					// called when resource is loaded
+					function ( slenderMan ) {
+						//object.position.lerp(camera, 0.95);
+						slenderMan.position.x = 400;
+						slenderMan.position.y = 0;
+						slenderMan.position.z = 200;
+						slenderMan.scale.x = 9;
+            			slenderMan.scale.y = 9;
+            			slenderMan.scale.z = 9;
+						slenderMan.rotateY(Math.PI*11/12)
+						slenderMan.traverse( function ( child ) {
+
+						if ( child instanceof THREE.Mesh ) {
+							const slenderTexture = new THREE.TextureLoader().load( 'models/slenderman/slenderman_color.png' );			
+							child.material = new THREE.MeshLambertMaterial( {map: slenderTexture, fog: true} )
+							}
+						} );
+						
+						scene.add( slenderMan );
+						slenders.push(slenderMan)						
+
+					},
+
+					function ( xhr ) {
+						console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+					},
+					// called when loading has errors
+					function ( error ) {
+						console.log( 'An error happened' );
+					}
+				);		
+
 				// flaslight
 
 				flashLight = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 7, 20), new THREE.MeshPhongMaterial({color:0x000000}));
@@ -502,7 +552,7 @@
 				camera.add(flashLight);
 
 				spotLight1 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-				spotLight1.power = 5;
+				spotLight1.power = 3.65;
 				spotLight1.angle = 0.55;
 				spotLight1.decay = 2;
 				spotLight1.penumbra = 0.1;
@@ -511,7 +561,7 @@
 				spotLight1.rotateX(Math.PI/2);
 
 				spotLight2 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-				spotLight2.power = 3;
+				spotLight2.power = 1.65;
 				spotLight2.angle = 0.65;
 				spotLight2.decay = 2;
 				spotLight2.penumbra = 0.1;
@@ -531,6 +581,15 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				//
+
+				//const composer = new THREE.EffectComposer( renderer);
+				//const renderPass = new THREE.RenderPass( scene, camera );
+				//const badTVPass = new THREE.ShaderPass( THREE.BadTVShader );
+				//composer.addPass( renderPass );
+				//composer.addPass( badTVPass );
+				//badTVPass.renderToScreen = true;						
 
 				//
 
@@ -602,57 +661,72 @@
 
 						canJump = true;
 
-					}		
+					}					
 
 					for(var i = 0; i < trees.length; i++) {
-						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveForward === true) {
-							controls.moveForward(velocity.z * delta);
-							velocity.x = 0
-							velocity.z = 0
-							console.log('Frente');
-						}
+						if ( raycaster.ray.intersectsBox( trees[i] ) === true) { 
+							velocity.x = 0;
+							velocity.z = 0;
+							controls.getObject().position.x = origem.x;
+							controls.getObject().position.y = origem.y;
+							controls.getObject().position.z = origem.z;
+							console.log('Colisão')
 
-						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveBackward === true) {
-							controls.moveForward((velocity.x * delta));
-							velocity.x = 0
-							velocity.z = 0
-							console.log('Trás');
-						}
-
-						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveRight === true) {
-							controls.moveRight(velocity.x * delta);
-							velocity.x = 0
-							velocity.x = 0
-							console.log('Direita');
-						}
-
-						if ( raycaster.ray.intersectsBox( trees[i] ) === true && moveLeft === true) {
-							controls.moveRight(-1*((velocity.x * delta)));
-							velocity.x = 0
-							velocity.x = 0
-							console.log('Esquerda');
-						}
-					}
+						}}
 
 					for(var i = 0; i < papers.length; i++) {
 						if ( raycaster.ray.origin.distanceTo(papers[i].position) <= 25 && interact === true) {
 							scene.remove(papers[i]);
 							papers.splice(papers.indexOf(papers[i]), 1);
+							const AudioLoader = new THREE.AudioLoader();							
+							if(pageFlipSound.isPlaying === false)
+								AudioLoader.load( 'sounds/page_flip.mp3', function( buffer ) {
+									pageFlipSound.setBuffer( buffer );
+									pageFlipSound.setLoop( false );
+									pageFlipSound.setVolume( 0.3 );
+									pageFlipSound.play();
+								});
 							console.log(papers.length)					
 						}
 					}
+
+
+					if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 75) {
+						console.log('Chegando!');
+						if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 50) {
+							console.log('Quase te pegou!');
+							if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 25) {
+								console.log('Pego!');
+
+								// load a sound and set it as the Audio object's buffer
+								const AudioLoader = new THREE.AudioLoader();
+								if(slenderStaticSound.isPlaying === false)
+								AudioLoader.load( 'sounds/slender_static.mp3', function( buffer ) {
+									slenderStaticSound.setBuffer( buffer );
+									slenderStaticSound.setLoop( false );
+									slenderStaticSound.setVolume( 0.2 );
+									slenderStaticSound.play();
+									controls.disconnect()
+									setTimeout(() => {  open(location, '_self').close(); }, 7500);
+								});
+							}
+						}
+					}
+
 				}
+
+				origem = raycaster.ray.origin.clone();
+				origem.y -= 10;	
 
 				if(moveBackward || moveForward || moveLeft || moveRight) {
 					const AudioLoader = new THREE.AudioLoader();
 					if(stepSound.isPlaying === false) {
 					AudioLoader.load( 'sounds/step' + Math.floor(Math.random() * 2) + '.mp3', function( buffer ) {
-						console.log(Math.floor(Math.random() * 3))
 						stepSound.setBuffer( buffer );
 						stepSound.setLoop( false);
-						stepSound.setVolume( 0.2 );
+						stepSound.setVolume( 0.4 );
 						stepSound.play();
-					});
+						});
 					}
 				}
 
@@ -660,10 +734,17 @@
 					console.log('Acabou!')
 				};
 
-				prevTime = time;
+				// movimentação slenderMan
 
-				renderer.render( scene, camera );
+				slenders[0].rotation.y = Math.atan2(( camera.position.z - slenders[0].position.z ) , ( camera.position.x - slenders[0].position.x ));
+				slenders[0].position.lerp(camera.position, 0.005)
+				if (slenders[0].position. y > 1) slenders[0].position.y = 1;
 
+				//			
+
+				prevTime = time;	
+
+			renderer.render( scene, camera );
 
 			}
 		</script>
