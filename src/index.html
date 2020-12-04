@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - pointerlock controls</title>
+		<title>Slenderman</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -46,11 +46,14 @@
 		<div id="blocker">
 
 			<div id="instructions">
-				<span style="font-size:36px">Click to play</span>
+				<span style="font-size:36px">Collect the pages to scape</span>
+				<br /><br />				
+				<span style="font-size:24px">Click to play</span>
 				<br /><br />
 				Move: WASD<br/>
-				Jump: SPACE<br/>
-				Look: MOUSE
+				Look: MOUSE<br/>
+				E: COLLECT PAGE<br/>
+				Shift: RUN
 			</div>
 
 		</div>
@@ -59,7 +62,6 @@
 		<script src="js/three.module.js"></script>
 		<script src="js/PointerLockControls.js"></script>
 		<script src="js/OBJLoader.js"></script>
-		<script src="js/BadTVShader.js"></script>
 		<script src="js/EffectComposer.js"></script>
 		<script src="js/ShaderPass.js"></script>
 		<script src="js/CopyShader.js"></script>
@@ -69,7 +71,7 @@
 
 		<script type="module">
 			(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
-			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2, slenderMan, origem;
+			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2, slenderMan, origem, composer, glitchPass, onKeyDown, moveSpeed;
 
 			const objects = [];
 
@@ -79,7 +81,6 @@
 			let moveBackward = false;
 			let moveLeft = false;
 			let moveRight = false;
-			let canJump = false;
 			let run = false;
 			let interact = false;
 
@@ -87,6 +88,12 @@
 			var papers = [];
 			var slenders = [];
 			let cameraBox, forestSound, stepSound, slenderStaticSound, pageFlipSound;
+			var slenderSpeed = 0.0;
+			var baseSlenderSpeed = 0.005;
+			var collectPages = 0;
+
+			var baseMoveSpeed = 4.0;
+			var stamina = 100;
 
 			// Save the current time
 			let prevTime = performance.now();
@@ -139,16 +146,17 @@
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
 
-			// 5, 4
+			//55x43
 			init();
 			animate();
 
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.6, 1000 );
-				camera.position.set(900, 10, 580);
+				camera.position.set(850, 10, 560);
 				camera.rotation.y = -5;
 				var cameraBox = new THREE.Box3().setFromObject( camera );
 
@@ -159,6 +167,8 @@
 				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.5 );  // ( 0xeeeeff, 0x777788, 0.5 )
 				light.position.set( 0.5, 1, 0.75 );
 				//scene.add(light);
+
+				//postprocessing
 
 				controls = new THREE.PointerLockControls( camera, document.body );
 
@@ -198,19 +208,23 @@
 					slenderStaticSound = new THREE.Audio( listener );
 					pageFlipSound = new THREE.Audio( listener );
 
+					slenderSpeed = baseSlenderSpeed + collectPages*0.0025;
+
 				} );
 
 				controls.addEventListener( 'unlock', function () {
 
 					blocker.style.display = 'block';
 					instructions.style.display = '';
+					slenderSpeed = 0;
+					moveBackward, moveForward, moveLeft, moveRight = false;
 					forestSound.stop();
 
 				} );
 
 				scene.add( controls.getObject() );
 
-				const onKeyDown = function ( event ) {
+				onKeyDown = function ( event ) {
 
 					switch ( event.keyCode ) {
 
@@ -232,11 +246,6 @@
 						case 39: // right
 						case 68: // d
 							moveRight = true;
-							break;
-
-						case 32: // space
-							if ( canJump === true ) velocity.y += 350;
-							canJump = false;
 							break;
 
 						case 16: // shift
@@ -303,7 +312,7 @@
 
 				// floor
 
-				let floorGeometry = new THREE.PlaneBufferGeometry( 2000, 2000, 100, 100 );
+				let floorGeometry = new THREE.PlaneBufferGeometry( 1000, 1220, 100, 100 );
 				floorGeometry.rotateX( - Math.PI / 2 );
 
 				// vertex displacement
@@ -329,6 +338,8 @@
 				const floorMaterial = new THREE.MeshPhongMaterial( { map : floor_texture } );
 
 				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+				floor.position.x = 430;
+				floor.position.z = 540;
 				scene.add( floor );
 
 				// objects
@@ -516,9 +527,9 @@
 					// called when resource is loaded
 					function ( slenderMan ) {
 						//object.position.lerp(camera, 0.95);
-						slenderMan.position.x = 400;
+						slenderMan.position.x = 150 + Math.floor(Math.random() * 600); 
 						slenderMan.position.y = 0;
-						slenderMan.position.z = 200;
+						slenderMan.position.z = 600 + Math.floor(Math.random() * 400); // começar do fundo de forma randomica
 						slenderMan.scale.x = 9;
             			slenderMan.scale.y = 9;
             			slenderMan.scale.z = 9;
@@ -577,21 +588,18 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				//const composer = new THREE.EffectComposer( renderer);
-				//const renderPass = new THREE.RenderPass( scene, camera );
-				//const badTVPass = new THREE.ShaderPass( THREE.BadTVShader );
-				//composer.addPass( renderPass );
-				//composer.addPass( badTVPass );
-				//badTVPass.renderToScreen = true;						
+				composer = new THREE.EffectComposer( renderer );
+				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
-				//
+				glitchPass = new THREE.GlitchPass();
+				composer.addPass( glitchPass );				
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -603,6 +611,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -624,8 +633,14 @@
 					const delta = ( time - prevTime ) / 1000;
 
 					// Set the velocity.x and velocity.z using the calculated time delta
-					let moveSpeed = 4.0;
-					if (run) moveSpeed = 2.0;
+					if (run && stamina > 1) {
+						moveSpeed = baseMoveSpeed*0.66;
+						stamina -= 1;
+					} else {
+						moveSpeed = baseMoveSpeed;
+						if(stamina <= 98.8) stamina += 0.055;
+					}
+
 					velocity.x -= velocity.x * moveSpeed * delta; //movement speed
 					velocity.z -= velocity.z * moveSpeed * delta; //movement speed
 
@@ -637,16 +652,7 @@
 
 					// Update the position using the changed delta
 					if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
-					if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
-
-					// Está em um ou mais objetos
-					if ( onObject === true ) {
-
-						velocity.y = Math.max( 0, velocity.y );
-						canJump = true;
-
-					}
-					
+					if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;					
 
 					controls.moveRight( - velocity.x * delta );
 					controls.moveForward( - velocity.z * delta );
@@ -658,8 +664,6 @@
 
 						velocity.y = 0;
 						controls.getObject().position.y = 10;
-
-						canJump = true;
 
 					}					
 
@@ -683,36 +687,34 @@
 								AudioLoader.load( 'sounds/page_flip.mp3', function( buffer ) {
 									pageFlipSound.setBuffer( buffer );
 									pageFlipSound.setLoop( false );
-									pageFlipSound.setVolume( 0.3 );
+									pageFlipSound.setVolume( 0.4 );
 									pageFlipSound.play();
 								});
-							console.log(papers.length)					
+							collectPages += 1;
+							slenderSpeed += 0.001;		
 						}
 					}
 
+					if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 50) {
+						console.log('Quase te pegou!');
+						if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 25) {
+							console.log('Pego!');
 
-					if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 75) {
-						console.log('Chegando!');
-						if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 50) {
-							console.log('Quase te pegou!');
-							if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 25) {
-								console.log('Pego!');
-
-								// load a sound and set it as the Audio object's buffer
-								const AudioLoader = new THREE.AudioLoader();
-								if(slenderStaticSound.isPlaying === false)
-								AudioLoader.load( 'sounds/slender_static.mp3', function( buffer ) {
-									slenderStaticSound.setBuffer( buffer );
-									slenderStaticSound.setLoop( false );
-									slenderStaticSound.setVolume( 0.2 );
-									slenderStaticSound.play();
-									controls.disconnect()
-									setTimeout(() => {  open(location, '_self').close(); }, 7500);
-								});
-							}
+							// load a sound and set it as the Audio object's buffer
+							glitchPass.goWild = true;
+							const AudioLoader = new THREE.AudioLoader();
+							if(slenderStaticSound.isPlaying === false)
+							AudioLoader.load( 'sounds/slender_static.mp3', function( buffer ) {
+								slenderStaticSound.setBuffer( buffer );
+								slenderStaticSound.setLoop( false );
+								slenderStaticSound.setVolume( 0.25 );
+								slenderStaticSound.play();
+								controls.disconnect()
+								document.removeEventListener('keydown', onKeyDown);										
+								setTimeout(() => {  open(location, '_self').close(); }, 7500);
+							});
 						}
 					}
-
 				}
 
 				origem = raycaster.ray.origin.clone();
@@ -731,21 +733,21 @@
 				}
 
 				if(papers.length <= 0) {
+					slenderSpeed = 0.0;
 					console.log('Acabou!')
 				};
 
 				// movimentação slenderMan
 
 				slenders[0].rotation.y = Math.atan2(( camera.position.z - slenders[0].position.z ) , ( camera.position.x - slenders[0].position.x ));
-				slenders[0].position.lerp(camera.position, 0.005)
+				slenders[0].position.lerp(camera.position, slenderSpeed)
 				if (slenders[0].position. y > 1) slenders[0].position.y = 1;
 
 				//			
 
-				prevTime = time;	
+				prevTime = time;
 
-			renderer.render( scene, camera );
-
+			composer.render( );
 			}
 		</script>
 	</body>
