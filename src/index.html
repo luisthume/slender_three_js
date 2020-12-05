@@ -71,7 +71,7 @@
 
 		<script type="module">
 			(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
-			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2, slenderMan, origem, composer, glitchPass, onKeyDown, moveSpeed;
+			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2, spotLight3, spotLight4,slenderMan, origem, composer, glitchPass, onKeyDown, moveSpeed;
 
 			const objects = [];
 
@@ -89,10 +89,10 @@
 			var slenders = [];
 			let cameraBox, forestSound, stepSound, slenderStaticSound, pageFlipSound;
 			var slenderSpeed = 0.0;
-			var baseSlenderSpeed = 0;//0.005;
+			var baseSlenderSpeed = 0.0025;
 			var collectPages = 0;
 
-			var baseMoveSpeed = 3.0;
+			var baseMoveSpeed = 6; //maior mais devagar
 			var stamina = 100;
 
 			// Save the current time
@@ -104,31 +104,31 @@
 
 			var coordArray =
 			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
- 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+ 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 			[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 1],
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1, 1, 1, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1], 
 			[1, 2, 3, 2, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 20, 14, 0, 0, 0, 16, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 2, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0], 
@@ -146,9 +146,9 @@
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 99, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
-
+			// pages 6, 7, 8, 9, 10
 			//55x43
 			init();
 			animate();
@@ -167,8 +167,6 @@
 				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.5 );  // ( 0xeeeeff, 0x777788, 0.5 )
 				light.position.set( 0.5, 1, 0.75 );
 				//scene.add(light);
-
-				//postprocessing
 
 				controls = new THREE.PointerLockControls( camera, document.body );
 
@@ -386,7 +384,7 @@
 							box.setFromObject(plane);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 
 							scene.add( plane );	
 							objects.push( plane );
@@ -408,7 +406,7 @@
 							box.setFromObject(plane);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 
 							scene.add( plane );	
 							objects.push( plane );					
@@ -428,7 +426,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );					
@@ -449,7 +447,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -471,7 +469,7 @@
 
 
                             const helper = new THREE.Box3Helper( box, 0xFF0B0B );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( plane );	
 							papers.push(plane);
 						}
@@ -492,7 +490,7 @@
 							box.setFromObject(plane);
 							
                             const helper = new THREE.Box3Helper( box, 0xFF0B0B );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( plane );	
 							papers.push(plane);
 						}			
@@ -500,6 +498,27 @@
 						else if (coordinates[j] === 8) {
 							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
 							const paper_texture = new THREE.TextureLoader().load( 'textures/page3.jpeg' );			
+							paper_texture.roation = Math.PI/2
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
+							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
+
+							plane.position.x = i*20+10;
+							plane.position.y = 8;
+							plane.position.z = j*20+1.8;
+							plane.rotateX(Math.PI*2);
+
+							const box = new THREE.Box3();
+							box.setFromObject(plane);
+
+                            const helper = new THREE.Box3Helper( box, 0xFF0B0B );
+							//scene.add( helper );
+							scene.add( plane );	
+							papers.push(plane);
+						}
+
+						else if (coordinates[j] === 9) {
+							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
+							const paper_texture = new THREE.TextureLoader().load( 'textures/page4.jpeg' );			
 							paper_texture.roation = Math.PI/2
 							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
 							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
@@ -516,6 +535,25 @@
 							papers.push(plane);
 						}
 
+						else if (coordinates[j] === 10) {
+							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
+							const paper_texture = new THREE.TextureLoader().load( 'textures/page5.jpeg' );			
+							paper_texture.roation = Math.PI/2
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
+							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
+
+							plane.position.x = i*20;
+							plane.position.y = 2;
+							plane.position.z = j*20;
+							plane.rotateX(Math.PI*3/2);
+
+							const box = new THREE.Box3();
+							box.setFromObject(plane);
+
+							scene.add( plane );	
+							papers.push(plane);
+						}												
+
 						else if (coordinates[j] === 11) {
 							const boxGeometry = new THREE.BoxGeometry( 120, 35, 3)
 							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
@@ -524,8 +562,8 @@
 							wall_texture.repeat.set( 5, 1 );									
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
@@ -542,7 +580,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -556,8 +594,8 @@
 							wall_texture.repeat.set( 4, 1 );								
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({color: 0xffffff , side: THREE.DoubleSide}), // FRONT SIDE
@@ -574,7 +612,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -588,8 +626,8 @@
 							wall_texture.repeat.set( 2, 1 );								
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
@@ -605,7 +643,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -616,8 +654,8 @@
 							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );			
 							const boxMaterials = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
@@ -637,7 +675,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -648,8 +686,8 @@
 							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );			
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
@@ -669,7 +707,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -680,8 +718,8 @@
 							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );			
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
@@ -700,7 +738,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -714,8 +752,8 @@
 							wall_texture.repeat.set( 4, 1 );				
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
@@ -732,7 +770,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -746,8 +784,8 @@
 							wall_texture.repeat.set( 1, 1 );			
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
@@ -764,7 +802,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -778,8 +816,8 @@
 							wall_texture.repeat.set( 1, 1 );		
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
@@ -796,7 +834,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -810,8 +848,8 @@
 							wall_texture.repeat.set( 4, 1 );								
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture , side: THREE.DoubleSide}), // FRONT SIDE
@@ -828,7 +866,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -842,8 +880,8 @@
 							wall_texture.repeat.set( 1, 1 );								
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
@@ -859,7 +897,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -873,8 +911,8 @@
 							wall_texture.repeat.set( 1, 1 );								
 							const boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
@@ -890,7 +928,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							scene.add( helper );
+							//scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -917,9 +955,9 @@
 						slenderMan.position.x = 400 + Math.floor(Math.random() * 400); 
 						slenderMan.position.y = 0;
 						slenderMan.position.z = 600 + Math.floor(Math.random() * 400); // começar do fundo de forma randomica
-						slenderMan.scale.x = 9;
-            			slenderMan.scale.y = 9;
-            			slenderMan.scale.z = 9;
+						slenderMan.scale.x = 11;
+            			slenderMan.scale.y = 11;
+            			slenderMan.scale.z = 11;
 						slenderMan.rotateY(Math.PI*11/12)
 						slenderMan.traverse( function ( child ) {
 
@@ -945,8 +983,9 @@
 
 				// flaslight
 
-				flashLight = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 7, 20), new THREE.MeshPhongMaterial({color:0x000000}));
+				flashLight = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 6.5, 12), new THREE.MeshBasicMaterial({color:0x212121}));
 				flashLight.rotateX(Math.PI/2);
+				flashLight.position.set(2,-3,0)
 				camera.add(flashLight);
 
 				spotLight1 = new THREE.SpotLight(0xcccccc, 0.5, 150);
@@ -965,13 +1004,36 @@
 				spotLight2.penumbra = 0.1;
 				spotLight2.distance = 200;
 				spotLight2.castShadow = true;
-				spotLight2.rotateX(Math.PI/2);				
+				spotLight2.rotateX(Math.PI/2);
+
+				spotLight3 = new THREE.SpotLight(0xffffff, 0.5, 150); //5b5e52
+				spotLight3.power = 5;
+				spotLight3.angle = 0.40;
+				spotLight3.decay = 6;
+				spotLight3.penumbra = 1;
+				spotLight3.distance = 200;
+				spotLight3.castShadow = true;
+				spotLight3.rotateX(Math.PI/2);
+
+				spotLight4 = new THREE.SpotLight(0xcccccc, 0.5, 150);
+				spotLight4.power = 2.65;
+				spotLight4.angle = 0.1;
+				spotLight4.decay = 6;
+				spotLight4.penumbra = 0.1;
+				spotLight4.distance = 200;
+				spotLight4.castShadow = true;
+				spotLight4.rotateX(Math.PI/2);											
 
 
 				flashLight.add(spotLight1);
 				flashLight.add(spotLight1.target);				
 				flashLight.add(spotLight2);
-				flashLight.add(spotLight2.target);				
+				flashLight.add(spotLight2.target);
+				flashLight.add(spotLight3);
+				flashLight.add(spotLight3.target);						
+				flashLight.add(spotLight4);
+				flashLight.add(spotLight4.target);
+				
 
 				//
 
@@ -980,13 +1042,13 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				//
+				//postprocessing
 
 				composer = new THREE.EffectComposer( renderer );
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
 				glitchPass = new THREE.GlitchPass();
-				composer.addPass( glitchPass );				
+				composer.addPass( glitchPass );	
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -1047,10 +1109,10 @@
 					controls.getObject().position.y += ( velocity.y * delta ); // new behavior
 
 					// Prevent the camera/player from falling out of the 'world'
-					if ( controls.getObject().position.y < 10 ) {
+					if ( controls.getObject().position.y < 18 ) {
 
 						velocity.y = 0;
-						controls.getObject().position.y = 10;
+						controls.getObject().position.y = 18;
 
 					}					
 
@@ -1066,7 +1128,9 @@
 						}}
 
 					for(var i = 0; i < papers.length; i++) {
-						if ( raycaster.ray.origin.distanceTo(papers[i].position) <= 25 && interact === true) {
+						var aux = raycaster.ray.origin.clone();
+						aux.y = 10;
+						if ( aux.distanceTo(papers[i].position) <= 15 && interact === true) {
 							scene.remove(papers[i]);
 							papers.splice(papers.indexOf(papers[i]), 1);
 							const AudioLoader = new THREE.AudioLoader();							
@@ -1082,12 +1146,16 @@
 						}
 					}
 
-					if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 50) {
-						console.log('Quase te pegou!');
-						if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 10) {
+					if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 110) { 
+						console.log('Perto');
+						spotLight1.power = Math.floor(Math.random() * 6);
+						spotLight2.power = Math.floor(Math.random() * 5);
+						spotLight3.power = Math.floor(Math.random() * 10);
+						spotLight4.power = Math.floor(Math.random() * 9);					
+
+						if (raycaster.ray.origin.distanceTo(slenders[0].position) < 60) { 
 							console.log('Pego!');
 
-							// load a sound and set it as the Audio object's buffer
 							glitchPass.goWild = true;
 							const AudioLoader = new THREE.AudioLoader();
 							if(slenderStaticSound.isPlaying === false)
@@ -1101,7 +1169,13 @@
 								setTimeout(() => {  open(location, '_self').close(); }, 7500);
 							});
 						}
+					} else {
+						spotLight1.power = 3.65;
+						spotLight2.power = 1.65;
+						spotLight3.power = 5;
+						spotLight4.power = 2.65;						
 					}
+
 				}
 
 				origem = raycaster.ray.origin.clone();
@@ -1129,11 +1203,7 @@
 				slenders[0].rotation.y = Math.atan2(( camera.position.z - slenders[0].position.z ) , ( camera.position.x - slenders[0].position.x ));
 				slenders[0].position.lerp(camera.position, slenderSpeed)
 				if (slenders[0].position. y > 1) slenders[0].position.y = 1;
-
-				//			
-
 				prevTime = time;
-
 			composer.render( );
 			}
 		</script>
