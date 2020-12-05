@@ -336,6 +336,9 @@
 
 				const floor_texture = new THREE.TextureLoader().load( 'textures/grass1.jpg' );
 				const floorMaterial = new THREE.MeshPhongMaterial( { map : floor_texture } );
+				floor_texture.wrapS = THREE.RepeatWrapping;
+				floor_texture.wrapT = THREE.RepeatWrapping;
+				floor_texture.repeat.set( 12, 12 );				
 
 				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				floor.position.x = 430;
@@ -518,7 +521,7 @@
 							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
 							wall_texture.wrapS = THREE.RepeatWrapping;
 							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );									
+							wall_texture.repeat.set( 5, 1 );									
 							const boxMaterial = 
 								[
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
@@ -582,7 +585,7 @@
 							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
 							wall_texture.wrapS = THREE.RepeatWrapping;
 							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );								
+							wall_texture.repeat.set( 2, 1 );								
 							const boxMaterial = 
 								[
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
@@ -654,7 +657,7 @@
 								];
 							wall_texture.wrapS = THREE.RepeatWrapping;
 							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );									
+							wall_texture.repeat.set( 5, 1 );									
 							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
 							box1.position.x = i*20;
@@ -836,7 +839,7 @@
 							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
 							wall_texture.wrapS = THREE.RepeatWrapping;
 							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );								
+							wall_texture.repeat.set( 1, 1 );								
 							const boxMaterial = 
 								[
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
@@ -867,7 +870,7 @@
 							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
 							wall_texture.wrapS = THREE.RepeatWrapping;
 							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );								
+							wall_texture.repeat.set( 1, 1 );								
 							const boxMaterial = 
 								[
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
