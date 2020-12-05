@@ -46,14 +46,14 @@
 		<div id="blocker">
 
 			<div id="instructions">
-				<span style="font-size:36px">Collect the pages to scape</span>
+				<span style="font-size:40px;color:#8d1212">Collect the pages to escape</span>
 				<br /><br />				
-				<span style="font-size:24px">Click to play</span>
+				<span style="font-size:30px">Click to play</span>
 				<br /><br />
-				Move: WASD<br/>
+				<span style="font-size:20px">Move: WASD<br/>
 				Look: MOUSE<br/>
 				E: COLLECT PAGE<br/>
-				Shift: RUN
+				Shift: RUN</span>
 			</div>
 
 		</div>
@@ -89,10 +89,10 @@
 			var slenders = [];
 			let cameraBox, forestSound, stepSound, slenderStaticSound, pageFlipSound;
 			var slenderSpeed = 0.0;
-			var baseSlenderSpeed = 0.005;
+			var baseSlenderSpeed = 0;//0.005;
 			var collectPages = 0;
 
-			var baseMoveSpeed = 4.0;
+			var baseMoveSpeed = 3.0;
 			var stamina = 100;
 
 			// Save the current time
@@ -102,7 +102,7 @@
 			const vertex = new THREE.Vector3();
 			const color = new THREE.Color();
 
-			var coordArray = 
+			var coordArray =
 			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
  			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -116,19 +116,19 @@
 			[1, 0, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 2, 3, 2, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 20, 14, 0, 0, 0, 16, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 2, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 0, 2, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0], 
@@ -511,7 +511,391 @@
 
 							scene.add( plane );	
 							papers.push(plane);
+						}
+
+						else if (coordinates[j] === 11) {
+							const boxGeometry = new THREE.BoxGeometry( 120, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );									
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20;
+							box1.position.y = 15;
+							box1.position.z = j*20-18.5;
+							//box1.rotateY(Math.PI / 2);
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 12) { //feito
+							const boxGeometry = new THREE.BoxGeometry( 80, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );								
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff , side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20;
+							box1.position.y = 15;
+							box1.position.z = j*20;
+							box1.rotateY(Math.PI / 2);
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 13) { //feito
+							const boxGeometry = new THREE.BoxGeometry( 45, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );								
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20-40;
+							box1.position.y = 15;
+							box1.position.z = j*20;
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 14) { //feito
+							const boxGeometry = new THREE.BoxGeometry( 60, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );			
+							const boxMaterials = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							//const boxMaterial = new THREE.MeshStandardMaterial( {map: wall_texture, side: THREE.BackSide} );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );									
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterials);
+
+							box1.position.x = i*20+29;
+							box1.position.y = 15;
+							box1.position.z = j*20+19;
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 15) { // contrário da 11 //feito
+							const boxGeometry = new THREE.BoxGeometry( 120, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );			
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );									
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20;
+							box1.position.y = 15;
+							box1.position.z = j*20+18.5;
+							//box1.rotateY(Math.PI / 2);
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 16) { // contrário da 14 //feito
+							const boxGeometry = new THREE.BoxGeometry( 90, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );			
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );									
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20+14;
+							box1.position.y = 15;
+							box1.position.z = j*20-19;
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 17) { // contrário da 11 //feito
+							const boxGeometry = new THREE.BoxGeometry( 60, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );				
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20-10;
+							box1.position.y = 15;
+							box1.position.z = j*20-47.5;
+							box1.rotateY(Math.PI / 2);
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 18) { // contrário da 11 //feito
+							const boxGeometry = new THREE.BoxGeometry( 12.5, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 1, 1 );			
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20-38;
+							box1.position.y = 15;
+							box1.position.z = j*20+5;
+							box1.rotateY(Math.PI / 2);
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 19) { // contrário da 11 //feito
+							const boxGeometry = new THREE.BoxGeometry( 12.5, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 1, 1 );		
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20-38;
+							box1.position.y = 15;
+							box1.position.z = j*20-5;
+							box1.rotateY(Math.PI / 2);
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 20) { //feito
+							const boxGeometry = new THREE.BoxGeometry( 80, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );								
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture , side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20;
+							box1.position.y = 15;
+							box1.position.z = j*20;
+							box1.rotateY(Math.PI / 2);
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
 						}																				
+
+						else if (coordinates[j] === 21) { //feito
+							const boxGeometry = new THREE.BoxGeometry( 22, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );								
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20-28;
+							box1.position.y = 15;
+							box1.position.z = j*20;
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}
+
+						else if (coordinates[j] === 22) { //feito
+							const boxGeometry = new THREE.BoxGeometry( 22, 35, 3)
+							const wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );								
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20-28;
+							box1.position.y = 15;
+							box1.position.z = j*20;
+							
+							const box = new THREE.Box3();
+							box.setFromObject(box1);
+
+							const helper = new THREE.Box3Helper( box, 0xffff00 );
+							scene.add( helper );
+							scene.add( box1 );	
+							objects.push( box1 );
+							trees.push( box );							
+						}						
+
+						else if (coordinates[j] === 99) {
+							camera.position.set(i*20, 5, 20*j)
+						}																			
 
 					}
 				}
@@ -527,7 +911,7 @@
 					// called when resource is loaded
 					function ( slenderMan ) {
 						//object.position.lerp(camera, 0.95);
-						slenderMan.position.x = 150 + Math.floor(Math.random() * 600); 
+						slenderMan.position.x = 400 + Math.floor(Math.random() * 400); 
 						slenderMan.position.y = 0;
 						slenderMan.position.z = 600 + Math.floor(Math.random() * 400); // começar do fundo de forma randomica
 						slenderMan.scale.x = 9;
@@ -697,7 +1081,7 @@
 
 					if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 50) {
 						console.log('Quase te pegou!');
-						if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 25) {
+						if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 10) {
 							console.log('Pego!');
 
 							// load a sound and set it as the Audio object's buffer
