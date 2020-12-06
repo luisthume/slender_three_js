@@ -40,11 +40,43 @@
 
 				cursor: pointer;
 			}
+
+			#gameover {
+				position: absolute;				
+				width: 100%;
+				height: 100%;
+
+				display: -webkit-box;
+				display: -moz-box;
+				display: box;
+
+				-webkit-box-orient: horizontal;
+				-moz-box-orient: horizontal;
+				box-orient: horizontal;
+
+				-webkit-box-pack: center;
+				-moz-box-pack: center;
+				box-pack: center;
+
+				-webkit-box-align: center;
+				-moz-box-align: center;
+				box-align: center;
+
+				text-align: center;
+				font-family: Arial;
+				font-size: 14px;
+				line-height: 24px;
+
+				visibility: hidden;			
+			}
 		</style>
 	</head>
 	<body>
+		<div id="gameover">
+			<br /><br />
+			<span style="font-size:60px;color:#8d1212">Thank you for the pages</span>
+		</div>
 		<div id="blocker">
-
 			<div id="instructions">
 				<span style="font-size:40px;color:#8d1212">Collect the pages to escape</span>
 				<br /><br />				
@@ -55,7 +87,6 @@
 				E: COLLECT PAGE<br/>
 				Shift: RUN</span>
 			</div>
-
 		</div>
 
 		<script src="js/three.js"></script>
@@ -71,7 +102,7 @@
 
 		<script type="module">
 			(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
-			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2, spotLight3, spotLight4,slenderMan, origem, composer, glitchPass, onKeyDown, moveSpeed;
+			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2, spotLight3, spotLight4,slenderMan, origem, composer, glitchPass, onKeyDown, moveSpeed, rustedCar;
 
 			const objects = [];
 
@@ -89,10 +120,10 @@
 			var slenders = [];
 			let cameraBox, forestSound, stepSound, slenderStaticSound, pageFlipSound;
 			var slenderSpeed = 0.0;
-			var baseSlenderSpeed = 0.0025;
+			var baseSlenderSpeed = 0;//0.0025;
 			var collectPages = 0;
 
-			var baseMoveSpeed = 6; //maior mais devagar
+			var baseMoveSpeed = 5; //maior mais devagar
 			var stamina = 100;
 
 			// Save the current time
@@ -107,44 +138,44 @@
  			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 			[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 7, 0, 0, 0, 0, 0, 0, 1],
+			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1],
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1, 1, 1, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1], 
-			[1, 2, 3, 2, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 2, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 20, 14, 0, 0, 0, 16, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 2, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0], 
+			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 1, 0, 0, 0, 23, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0], 
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+			[1, 2, 3, 2, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
 			[1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-			[0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-			[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+			[0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+			[0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
 			[0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 99, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
@@ -172,6 +203,7 @@
 
 				const blocker = document.getElementById( 'blocker' );
 				const instructions = document.getElementById( 'instructions' );
+				const gameover = document.getElementById( 'gameover' );
 
 				instructions.addEventListener( 'click', function () {
 
@@ -371,7 +403,10 @@
 							trees.push( box );
 						}
 						else if (coordinates[j] === 2) {
-							const planeGeometry = new THREE.PlaneGeometry( 80, 50)
+
+							const containerLenght = 80;
+							const containerHeight = 50;
+							const planeGeometry = new THREE.PlaneGeometry( containerLenght, containerHeight)
 							const container_texture = new THREE.TextureLoader().load( 'textures/container.png' );			
 							const planeMaterial = new THREE.MeshPhongMaterial( {map: container_texture, side: THREE.DoubleSide} );
 							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
@@ -380,15 +415,19 @@
 							plane.position.y = 20;
 							plane.position.z = j*20;
 
-							const box = new THREE.Box3();
-							box.setFromObject(plane);
+							const boxGeometry = new THREE.BoxGeometry( containerLenght, containerHeight, 2)		
+							const collisionBox1 = new THREE.Mesh( boxGeometry);
+							
+							collisionBox1.position.x = i*20;
+							collisionBox1.position.y = 20;
+							collisionBox1.position.z = j*20;
 
-							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							const box1 = new THREE.Box3();
+
+							box1.setFromObject(collisionBox1);	
 
 							scene.add( plane );	
-							objects.push( plane );
-							trees.push( box );						
+							trees.push( box1 );						
 						}
 
 						else if (coordinates[j] === 3) {
@@ -405,11 +444,7 @@
 							const box = new THREE.Box3();
 							box.setFromObject(plane);
 
-							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
-
-							scene.add( plane );	
-							objects.push( plane );					
+							scene.add( plane );						
 						}
 
 						else if (coordinates[j] === 4) {
@@ -426,7 +461,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );					
@@ -447,7 +482,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -469,7 +504,7 @@
 
 
                             const helper = new THREE.Box3Helper( box, 0xFF0B0B );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( plane );	
 							papers.push(plane);
 						}
@@ -490,7 +525,7 @@
 							box.setFromObject(plane);
 							
                             const helper = new THREE.Box3Helper( box, 0xFF0B0B );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( plane );	
 							papers.push(plane);
 						}			
@@ -511,7 +546,7 @@
 							box.setFromObject(plane);
 
                             const helper = new THREE.Box3Helper( box, 0xFF0B0B );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( plane );	
 							papers.push(plane);
 						}
@@ -580,7 +615,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -612,7 +647,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -643,7 +678,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -675,7 +710,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -707,7 +742,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -738,7 +773,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -770,7 +805,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -802,7 +837,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -834,7 +869,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -866,7 +901,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -897,7 +932,7 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
@@ -928,11 +963,83 @@
 							box.setFromObject(box1);
 
 							const helper = new THREE.Box3Helper( box, 0xffff00 );
-							//scene.add( helper );
+							scene.add( helper );
 							scene.add( box1 );	
 							objects.push( box1 );
 							trees.push( box );							
-						}						
+						}
+
+						else if (coordinates[j] === 23) {
+
+							const tunnelLenght = 200;
+							const tunnelRad = 45;
+
+							const cylinderGeometry = new THREE.CylinderBufferGeometry( tunnelRad, tunnelRad, tunnelLenght, 24, 1, true )
+							const tunnelTexture = new THREE.TextureLoader().load( 'textures/cement.jpg' );
+							const cylinderMaterial = new THREE.MeshPhongMaterial( {  map : tunnelTexture, side: THREE.DoubleSide});							
+							const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+
+							cylinder.position.x = i*20;
+							cylinder.position.y = 30;
+							cylinder.position.z = j*20;
+							cylinder.rotateX(Math.PI / 2);
+							cylinder.rotateZ(Math.PI/2);
+
+							const cylinderGeometry2 = new THREE.CylinderBufferGeometry( tunnelRad+0.25, tunnelRad+0.25, tunnelLenght, 24, 1, true )							
+							const cylinder2 = new THREE.Mesh( cylinderGeometry2, cylinderMaterial );
+
+							cylinder2.position.x = i*20;
+							cylinder2.position.y = 30;
+							cylinder2.position.z = j*20;
+							cylinder2.rotateX(Math.PI / 2);
+							cylinder2.rotateZ(Math.PI/2);
+
+							const cylinderGeometry3 = new THREE.CylinderBufferGeometry( tunnelRad+0.5, tunnelRad+0.5, tunnelLenght, 24, 1, true )							
+							const cylinder3 = new THREE.Mesh( cylinderGeometry3, cylinderMaterial );
+
+							cylinder3.position.x = i*20;
+							cylinder3.position.y = 30;
+							cylinder3.position.z = j*20;
+							cylinder3.rotateX(Math.PI / 2);
+							cylinder3.rotateZ(Math.PI/2);							
+
+							const cylinderGeometry4 = new THREE.CylinderBufferGeometry( tunnelRad+1, tunnelRad+1, tunnelLenght, 24, 1, true )							
+							const cylinder4 = new THREE.Mesh( cylinderGeometry4, cylinderMaterial );
+
+							cylinder4.position.x = i*20;
+							cylinder4.position.y = 30;
+							cylinder4.position.z = j*20;
+							cylinder4.rotateX(Math.PI / 2);
+							cylinder4.rotateZ(Math.PI/2);		
+							
+							const boxGeometry = new THREE.BoxGeometry( tunnelLenght, 46, 5)		
+							const collisionBox1 = new THREE.Mesh( boxGeometry);
+
+							collisionBox1.position.x = i*20;
+							collisionBox1.position.y = 20;
+							collisionBox1.position.z = j*20-42;
+
+							const collisionBox2 = new THREE.Mesh( boxGeometry);
+
+							collisionBox2.position.x = i*20;
+							collisionBox2.position.y = 20;
+							collisionBox2.position.z = j*20+42;
+
+							const box1 = new THREE.Box3();
+
+							box1.setFromObject(collisionBox1);							
+
+							const box2 = new THREE.Box3();
+							box2.setFromObject(collisionBox2);							
+
+							trees.push(box1)
+							trees.push(box2)
+
+							scene.add( cylinder );
+							scene.add( cylinder2 );
+							scene.add( cylinder3 );								
+							scene.add( cylinder4 );	
+						}
 
 						else if (coordinates[j] === 99) {
 							camera.position.set(i*20, 5, 20*j)
@@ -954,7 +1061,7 @@
 						//object.position.lerp(camera, 0.95);
 						slenderMan.position.x = 400 + Math.floor(Math.random() * 400); 
 						slenderMan.position.y = 0;
-						slenderMan.position.z = 600 + Math.floor(Math.random() * 400); // começar do fundo de forma randomica
+						slenderMan.position.z = 400 + Math.floor(Math.random() * 400); // começar do fundo de forma randomica
 						slenderMan.scale.x = 11;
             			slenderMan.scale.y = 11;
             			slenderMan.scale.z = 11;
@@ -963,7 +1070,7 @@
 
 						if ( child instanceof THREE.Mesh ) {
 							const slenderTexture = new THREE.TextureLoader().load( 'models/slenderman/slenderman_color.png' );			
-							child.material = new THREE.MeshLambertMaterial( {map: slenderTexture, fog: true} )
+							child.material = new THREE.MeshStandardMaterial( {map: slenderTexture, fog: true} )
 							}
 						} );
 						
@@ -1033,7 +1140,6 @@
 				flashLight.add(spotLight3.target);						
 				flashLight.add(spotLight4);
 				flashLight.add(spotLight4.target);
-				
 
 				//
 
@@ -1148,15 +1254,18 @@
 
 					if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 110) { 
 						console.log('Perto');
+
 						spotLight1.power = Math.floor(Math.random() * 6);
 						spotLight2.power = Math.floor(Math.random() * 5);
 						spotLight3.power = Math.floor(Math.random() * 10);
 						spotLight4.power = Math.floor(Math.random() * 9);					
 
-						if (raycaster.ray.origin.distanceTo(slenders[0].position) < 60) { 
-							console.log('Pego!');
-
+						if (raycaster.ray.origin.distanceTo(slenders[0].position) <  60) { //60
+						
+							controls.disconnect();
+							camera.rotation.y = Math.atan2(( slenders[0].position.z - camera.position.z ) , ( slenders[0].position.x - camera.position.x ));
 							glitchPass.goWild = true;
+
 							const AudioLoader = new THREE.AudioLoader();
 							if(slenderStaticSound.isPlaying === false)
 							AudioLoader.load( 'sounds/slender_static.mp3', function( buffer ) {
@@ -1164,8 +1273,7 @@
 								slenderStaticSound.setLoop( false );
 								slenderStaticSound.setVolume( 0.25 );
 								slenderStaticSound.play();
-								controls.disconnect()
-								document.removeEventListener('keydown', onKeyDown);										
+								document.removeEventListener('keydown', onKeyDown);
 								setTimeout(() => {  open(location, '_self').close(); }, 7500);
 							});
 						}
@@ -1194,7 +1302,8 @@
 				}
 
 				if(papers.length <= 0) {
-					slenderSpeed = 0.0;
+					gameover.style.visibility = 'visible';						
+					slenderSpeed = 0.02;
 					console.log('Acabou!')
 				};
 
@@ -1203,6 +1312,9 @@
 				slenders[0].rotation.y = Math.atan2(( camera.position.z - slenders[0].position.z ) , ( camera.position.x - slenders[0].position.x ));
 				slenders[0].position.lerp(camera.position, slenderSpeed)
 				if (slenders[0].position. y > 1) slenders[0].position.y = 1;
+
+				//
+
 				prevTime = time;
 			composer.render( );
 			}
