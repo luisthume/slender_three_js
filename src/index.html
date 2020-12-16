@@ -5,6 +5,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="stylesheet" href="css/style.css">
+        <style>
+        	body { margin: 0; }
+        	canvas { width: 100%; height:100%;};
+    	</style>
 	</head>
 	<body>
 		<div id="gameover">
@@ -93,9 +97,9 @@
 			[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 1, 0, 0, 0, 23, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-			[0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+			[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 			[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], 
 			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], 
@@ -339,6 +343,7 @@
 							objects.push( cylinder );
 							trees.push( box );
 						}
+						
 						else if (coordinates[j] === 2) {
 
 							const containerLenght = 80;
@@ -466,7 +471,7 @@
 							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
 
 							plane.position.x = i*20+10;
-							plane.position.y = 8;
+							plane.position.y = 12;
 							plane.position.z = j*20+1.8;
 							plane.rotateX(Math.PI*2);
 
@@ -521,11 +526,22 @@
 							wall_texture.wrapS = THREE.RepeatWrapping;
 							wall_texture.wrapT = THREE.RepeatWrapping;
 							wall_texture.repeat.set( 2, 1 );
+
+							const wall_texture2 = new THREE.TextureLoader().load( 'textures/dirty_wall.jpg' );
+							wall_texture2.wrapS = THREE.RepeatWrapping;
+							wall_texture2.wrapT = THREE.RepeatWrapping;
+							wall_texture2.repeat.set( 1, 1 );
+
+							const wall_texture3 = new THREE.TextureLoader().load( 'textures/dirty_wall.jpg' );
+							wall_texture3.wrapS = THREE.RepeatWrapping;
+							wall_texture3.wrapT = THREE.RepeatWrapping;
+							wall_texture3.repeat.set( 0.1, 1 );							
+							
 							var boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
@@ -556,7 +572,7 @@
 							objects.push( box2 );
 							trees.push( collisionBox2 );
 
-						////
+							//// PAREDE ESQUERDA DA PORTA DE ENTRADA
 
 							boxGeometry = new THREE.BoxBufferGeometry( 22, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
@@ -565,11 +581,11 @@
 							wall_texture.repeat.set( 1, 1 );								
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box3 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -584,7 +600,7 @@
 							scene.add( box3 );	
 							trees.push( collisionBox3 );	
 
-						///							
+							///							
 
 							boxGeometry = new THREE.BoxBufferGeometry( 22, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
@@ -593,12 +609,12 @@
 							wall_texture.repeat.set( 1, 1 );								
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box4 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -612,7 +628,7 @@
 							scene.add( box4 );	
 							trees.push( collisionBox4 );
 
-///
+							///
 
 							boxGeometry = new THREE.BoxBufferGeometry( 12.5, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
@@ -621,11 +637,11 @@
 							wall_texture.repeat.set( 1, 1 );			
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
 									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box5 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -641,7 +657,7 @@
 							scene.add( box5 );	
 							trees.push( collisionBox5 );	
 
-///
+							///
 
 							boxGeometry = new THREE.BoxBufferGeometry( 12.5, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
@@ -650,11 +666,11 @@
 							wall_texture.repeat.set( 1, 1 );			
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box6 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -670,7 +686,7 @@
 							scene.add( box6 );	
 							trees.push( collisionBox6 );	
 
-///
+							/// LATERAL DIREITA INFERIOR EXTERTA
 
 							boxGeometry = new THREE.BoxBufferGeometry( 80, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
@@ -679,11 +695,11 @@
 							wall_texture.repeat.set( 4, 1 );								
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff , side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box7 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -699,7 +715,7 @@
 							scene.add( box7 );	
 							trees.push( collisionBox7 );
 
-///
+							/// LATERAL ESQUERDA INFERIOR EXTERTA
 
 							boxGeometry = new THREE.BoxBufferGeometry( 80, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
@@ -708,11 +724,11 @@
 							wall_texture.repeat.set( 4, 1 );								
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff , side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box8 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -728,7 +744,7 @@
 							scene.add( box8 );	
 							trees.push( collisionBox8 );
 
-/// LATERAL DIREITA EXTERNA
+							/// LATERAL DIREITA EXTERNA
 
 							boxGeometry = new THREE.BoxBufferGeometry( 120, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
@@ -737,12 +753,12 @@
 							wall_texture.repeat.set( 5, 1 );									
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box9 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -756,7 +772,7 @@
 							scene.add( box9 );	
 							trees.push( collisionBox9 );
 
-/// LATERAL ESQUERDA EXTERNA
+							/// LATERAL ESQUERDA EXTERNA
 
 							boxGeometry = new THREE.BoxBufferGeometry( 120, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
@@ -765,11 +781,11 @@
 							wall_texture.repeat.set( 5, 1 );									
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box10 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -793,12 +809,12 @@
 							wall_texture.repeat.set( 4, 1 );								
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture , side: THREE.DoubleSide}), // FRONT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box11 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -822,12 +838,12 @@
 							wall_texture.repeat.set( 4, 1 );								
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture , side: THREE.DoubleSide}), // FRONT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box12 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -848,9 +864,9 @@
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );			
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
@@ -876,19 +892,18 @@
 
 							boxGeometry = new THREE.BoxBufferGeometry( 60, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );			
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 4, 1 );
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
 									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
 								];
-
-							wall_texture.wrapS = THREE.RepeatWrapping;
-							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );
 
 							const box14 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -906,19 +921,18 @@
 
 							boxGeometry = new THREE.BoxBufferGeometry( 28, 35, 3)
 							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );			
-							boxMaterial = 
-								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
-								];
-
 							wall_texture.wrapS = THREE.RepeatWrapping;
 							wall_texture.wrapT = THREE.RepeatWrapping;
 							wall_texture.repeat.set( 2, 1 );
+							boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
 
 							const box15 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -935,18 +949,14 @@
 							/// PARTE SUPERIOR DA ENTRADA
 
 							boxGeometry = new THREE.BoxBufferGeometry( 60, 35, 3)
-							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
-							wall_texture.wrapS = THREE.RepeatWrapping;
-							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );		
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box16 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -963,23 +973,19 @@
 
 							/// TETO MEIO
 
-							boxGeometry = new THREE.BoxBufferGeometry( 123, 200, 3)
-							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
-							wall_texture.wrapS = THREE.RepeatWrapping;
-							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );
+							boxGeometry = new THREE.BoxBufferGeometry( 124, 200, 3)
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box17 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
-							box17.position.x = i*20-80;
+							box17.position.x = i*20-79.5;
 							box17.position.y = 32.5;
 							box17.position.z = j*20-20;
 							box17.rotateX(Math.PI*3/2);
@@ -989,18 +995,14 @@
 							/// TETO PORTA
 
 							boxGeometry = new THREE.BoxBufferGeometry( 22, 43, 3)
-							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
-							wall_texture.wrapS = THREE.RepeatWrapping;
-							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box18 = new THREE.Mesh( boxGeometry, boxMaterial);
 
@@ -1011,22 +1013,17 @@
 
 							scene.add( box18 );								
 
-///
-
+							/// TETO SAÍDA
 
 							boxGeometry = new THREE.BoxBufferGeometry( 31, 60, 3)
-							wall_texture = new THREE.TextureLoader().load( 'textures/bathroom_wall.png' );
-							wall_texture.wrapS = THREE.RepeatWrapping;
-							wall_texture.wrapT = THREE.RepeatWrapping;
-							wall_texture.repeat.set( 4, 1 );
 							boxMaterial = 
 								[
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // RIGHT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // LEFT SIDE
-									new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // BOTTOM SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}), // FRONT SIDE
-									new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}) // BACK SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
 								];
 							const box19 = new THREE.Mesh( boxGeometry, boxMaterial);
 
