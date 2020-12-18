@@ -31,6 +31,8 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	var vec = new THREE.Vector3();
 
+	this.speedFactor = 0.002;
+
 	function onMouseMove( event ) {
 
 		if ( scope.isLocked === false ) return;
@@ -40,8 +42,8 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 		euler.setFromQuaternion( camera.quaternion );
 
-		euler.y -= movementX * 0.002;
-		euler.x -= movementY * 0.002;
+		euler.y -= movementX * scope.speedFactor;
+		euler.x -= movementY * scope.speedFactor;
 
 		euler.x = Math.max( PI_2 - scope.maxPolarAngle, Math.min( PI_2 - scope.minPolarAngle, euler.x ) );
 
