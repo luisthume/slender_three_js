@@ -58,19 +58,20 @@
 			let run = false;
 			let interact = false;
 			let lanternPicked = false;
-			let onWater, flashLightBody, flashLightLamp;
+			let gateClosed = false;
+			let onWater, flashLightBody, flashLightLamp, flashLightCircle;
 
 			const objects = [];
 			const papers = [];
 			const slenders = [];
 			const water = [];
-			let forestSound, stepSound, slenderStaticSound, pageFlipSound, rainSound;
+			let forestSound, stepSound, slenderStaticSound, pageFlipSound, rainSound, flashLightClickSound, gateClosingSound;
 			var slenderSpeed = 0.0;
-			var baseSlenderSpeed = 0.0025;
+			var baseSlenderSpeed = 0;//0.0025;
 			var collectPages = 0;
 			var inicialPapersLenght = 0;
 
-			var baseMoveSpeed = 5.5; //maior mais devagar
+			var baseMoveSpeed = 7.5; //maior mais devagar
 			var stamina = 100;
 			const mouseSpeed = 0.0008;
 
@@ -94,6 +95,9 @@
 
 			init();
 			animate();
+
+			var AudioLoader = new THREE.AudioLoader(loadingManager);
+			const listener = new THREE.AudioListener();
 
 			function init() {				
 
@@ -119,7 +123,7 @@
 				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0xffffff, 2, 0 );
 
-				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.10 );  // ( 0xeeeeff, 0x777788, 0.5 )
+				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 1.00 );  // ( 0xeeeeff, 0x777788, 0.5 )
 				light.position.set( 0.5, 1, 0.75 );
 				//scene.add(light);
 
@@ -137,7 +141,7 @@
 
 				}, false );
 
-				// Permisão de primeiro input
+				// Permisão 
 				controls.addEventListener( 'lock', function () {
 
 					instructions.style.display = 'none';
@@ -145,14 +149,24 @@
 					pages.style.visibility = 'visible';
 					
 					// create an AudioListener and add it to the camera
-					const listener = new THREE.AudioListener();
 					camera.add( listener );
 
-					// create a global audio source
+					if(gateClosed === false) {
+						gateClosingSound = new THREE.Audio( listener );
+						AudioLoader.load( 'sounds/gateClosingSound.mp3', function( buffer ) {
+						gateClosingSound.setBuffer( buffer );
+						gateClosingSound.setLoop( false );
+						gateClosingSound.setVolume( 0.6 );
+						gateClosingSound.play();
+						gateClosed = true;
+					});
+
+					}
+
 					forestSound = new THREE.Audio( listener );
 					rainSound = new THREE.Audio( listener );
-					// load a sound and set it as the Audio object's buffer
-					const AudioLoader = new THREE.AudioLoader(loadingManager);
+					flashLightClickSound = new THREE.Audio( listener );
+					
 					AudioLoader.load( 'sounds/forest.mp3', function( buffer ) {
 						forestSound.setBuffer( buffer );
 						forestSound.setLoop( true );
@@ -312,7 +326,7 @@
 							const three_texture = new THREE.TextureLoader(loadingManager).load( 'textures/arvore.jpeg' );
 							const cylinderMaterial = new THREE.MeshPhongMaterial( {  map : three_texture} );							
 							const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
-
+							
 							cylinder.position.x = i*20;
 							cylinder.position.y = 95;
 							cylinder.position.z = j*20;
@@ -488,7 +502,7 @@
 
 							plane.position.x = i*20+6.4;
 							plane.position.y = 14.1;
-							plane.position.z = j*20+5;
+							plane.position.z = j*20-3;
 							plane.rotateX(Math.PI/2);
 							plane.rotateY(Math.PI);
 
@@ -1030,6 +1044,70 @@
 							
 							scene.add( box19 );	
 
+							/// CHAO MEIO
+
+							boxGeometry = new THREE.BoxBufferGeometry( 124, 200, 3)
+							boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box20 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box20.position.x = i*20-79.5;
+							box20.position.y = 0.45;
+							box20.position.z = j*20-20;
+							box20.rotateX(Math.PI*3/2);
+							
+							scene.add( box20 );	
+
+							// CHAO PORTA
+
+							boxGeometry = new THREE.BoxBufferGeometry( 22, 43, 3)
+							boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box21 = new THREE.Mesh( boxGeometry, boxMaterial);
+
+							box21.position.x = i*20-8;
+							box21.position.y = 0.45;
+							box21.position.z = j*20-20;
+							box21.rotateX(Math.PI*3/2);
+
+							scene.add( box21 );	
+
+							/// CHAO SAÍDA
+
+							boxGeometry = new THREE.BoxBufferGeometry( 31, 60, 3)
+							boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+								];
+							const box22 = new THREE.Mesh( boxGeometry, boxMaterial);
+
+							box22.position.x = i*20-156;
+							box22.position.y = 0.45;
+							box22.position.z = j*20-28.5;
+							box22.rotateX(Math.PI*3/2);
+							
+							scene.add( box22 );	
+
+
 						}
 
 						else if (coordinates[j] === 12) {
@@ -1229,25 +1307,185 @@
 						const collisionBox1 = new THREE.Box3();
 						collisionBox1.setFromObject(cylinder);
 
+						const collisionBox2 = new THREE.Box3();
+						collisionBox2.setFromObject(plank);
+
 						scene.add( circle );
 						scene.add( torus );
 						scene.add( cylinder );
 						scene.add( cylinder2 );
 						objects.push(collisionBox1);
+						objects.push(collisionBox2);
+						}
+
+						else if (coordinates[j] === 40) {
+							const scale = 2;
+							const boxGeometry = new THREE.BoxBufferGeometry( scale, scale, scale)
+							const red_texture = new THREE.TextureLoader(loadingManager).load( 'textures/magic_cube/red_cube.jpeg' );
+							const orange_texture = new THREE.TextureLoader(loadingManager).load( 'textures/magic_cube/orange_cube.jpeg' );
+							const blue_texture = new THREE.TextureLoader(loadingManager).load( 'textures/magic_cube/blue_cube.jpeg' );
+							const white_texture = new THREE.TextureLoader(loadingManager).load( 'textures/magic_cube/white_cube.jpeg' );
+							const green_texture = new THREE.TextureLoader(loadingManager).load( 'textures/magic_cube/green_cube.jpeg' );
+							const yellow_texture = new THREE.TextureLoader(loadingManager).load( 'textures/magic_cube/yellow_cube.jpeg' );
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: red_texture}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: orange_texture}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: blue_texture}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: white_texture}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: green_texture}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: yellow_texture}) // BACK SIDE
+								];
+
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20-10;
+							box1.position.y = 2.9;
+							box1.position.z = j*20+3;
+							box1.rotateY(Math.PI/6)
+
+							scene.add(box1);
+						}	
+
+						else if (coordinates[j] === 41) {
+							const scale = 3.2;
+							const x = -12;
+							const z = -8;
+							const boxGeometry = new THREE.BoxBufferGeometry( scale, scale, scale)
+							const clownBoxTexture = new THREE.TextureLoader(loadingManager).load( 'textures/clown_box.jpg' );
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: clownBoxTexture}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: clownBoxTexture}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: clownBoxTexture}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: clownBoxTexture}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: clownBoxTexture}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: clownBoxTexture}) // BACK SIDE
+								];
+
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20+x;
+							box1.position.y = scale*0.9+1;
+							box1.position.z = j*20+z;
+
+							var cylinderGeometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 1.75, 12)
+							var cylinderMaterial = new THREE.MeshStandardMaterial( {  color : 0x43464B, side: THREE.DoubleSide});							
+							var cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+
+							cylinder.position.x = i*20+1.75+x;
+							cylinder.position.y = 4;
+							cylinder.position.z = j*20+z;
+							cylinder.rotateX(Math.PI / 4);
+							cylinder.rotateZ(Math.PI/2);
+
+							//
+
+							cylinderGeometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 1, 12)
+							cylinderMaterial = new THREE.MeshStandardMaterial( {  color : 0x43464B, side: THREE.DoubleSide});							
+							const cylinder2 = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+
+							cylinder2.position.x = i*20+2.55+x;
+							cylinder2.position.y = 4.5;
+							cylinder2.position.z = j*20+z;
+							cylinder2.rotateY(Math.PI/2);
+
+							//							
+
+							const woodTexture = new THREE.TextureLoader(loadingManager).load( 'textures/plank.jpg' );
+							cylinderGeometry = new THREE.CylinderBufferGeometry( 0.2, 0.2, 1, 12)
+							cylinderMaterial = new THREE.MeshStandardMaterial( {  map : woodTexture, side: THREE.DoubleSide});							
+							const cylinder3 = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+
+							cylinder3.position.x = i*20+3+x;
+							cylinder3.position.y = 5;
+							cylinder3.position.z = j*20+z;
+							cylinder3.rotateX(Math.PI/2);
+							cylinder3.rotateZ(Math.PI/2);
+
+
+							scene.add(box1);
+							scene.add(cylinder);
+							scene.add(cylinder2);
+							scene.add(cylinder3);
+						}							
+
+						else if (coordinates[j] === 42) {
+							const mattressLoader = new THREE.OBJLoader(loadingManager);
+							let mattress;
+							// load a resource
+							mattressLoader.load(
+								// resource URL
+								'models/mattress/mattress.obj',
+								// called when resource is loaded
+								function ( mattress ) {
+									mattress.position.x = i*20-19.8;
+									mattress.position.y = 4.35;
+									mattress.position.z = j*20-648.8;		
+
+									mattress.scale.x = 0.18;
+									mattress.scale.y = 0.10;
+									mattress.scale.z = 0.18;
+									mattress.rotateX(Math.PI)
+									mattress.rotateY(Math.PI)	
+
+									mattress.traverse( function ( child ) {
+
+									if ( child instanceof THREE.Mesh ) {
+										const mattressTexture = new THREE.TextureLoader(loadingManager).load( 'models/mattress/mattressTexture.jpg' );			
+										child.material = new THREE.MeshStandardMaterial( {map: mattressTexture, side: THREE.DoubleSide} )
+										}
+									} );
+									scene.add( mattress );
+								}
+							);
+						}
+
+						else if (coordinates[j] === 43) {
+							const garbageCanLoader = new THREE.OBJLoader(loadingManager);
+							let garbageCan;
+							// load a resource
+							garbageCanLoader.load(
+								// resource URL
+								'models/garbage_can/garbage_can.obj',
+								// called when resource is loaded
+								function ( garbageCan ) {
+									garbageCan.position.x = i*20;
+									garbageCan.position.y = 4.5;
+									garbageCan.position.z = j*20-465.5;		
+									garbageCan.rotateX(Math.PI/2);
+									garbageCan.rotateZ(-Math.PI/1.6)
+
+									garbageCan.scale.x = 0.05;
+									garbageCan.scale.y = 0.05;
+									garbageCan.scale.z = 0.05;
+
+									garbageCan.traverse( function ( child ) {
+
+									if ( child instanceof THREE.Mesh ) {
+										const garbageCanTexture = new THREE.TextureLoader(loadingManager).load( 'models/garbage_can/garbage_can.png' );			
+										child.material = new THREE.MeshBasicMaterial( {map: garbageCanTexture, side: THREE.DoubleSide} )
+										}
+									} );
+									scene.add( garbageCan );
+								}
+							);
 						}
 
 						else if (coordinates[j] === 30) {
-							flashLightBody = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 6.5, 12), new THREE.MeshStandardMaterial({color:0x212121}));
+							const flashLightColor = 0x1F1F1F;
+
+							flashLightBody = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 6.5, 12), new THREE.MeshBasicMaterial({color:flashLightColor}));
 							flashLightBody.position.x = i*20;
 							flashLightBody.position.y = 2.2;
 							flashLightBody.position.z = j*20;
 							flashLightBody.rotateX(Math.PI/2);
 							flashLightBody.rotateZ(Math.PI-Math.PI*3/10)
 
-							flashLightLamp = new THREE.Mesh(new THREE.CylinderGeometry(2, 1, 2, 12), new THREE.MeshStandardMaterial({color:0x212121}));
-							flashLightLamp.position.x = i*20-3.5;
+							flashLightLamp = new THREE.Mesh(new THREE.CylinderGeometry(2, 1, 2, 12), new THREE.MeshBasicMaterial({color:flashLightColor}));
+							flashLightLamp.position.x = i*20-3.435;
 							flashLightLamp.position.y = 2.2;
-							flashLightLamp.position.z = j*20-2.65;
+							flashLightLamp.position.z = j*20-2.525;
 							flashLightLamp.rotateX(Math.PI/2)
 							flashLightLamp.rotateZ(Math.PI-Math.PI*3/10)	
 
@@ -1267,20 +1505,61 @@
 							spotLight2.distance = 200;
 							spotLight2.castShadow = true;
 
+							const texture = new THREE.TextureLoader(loadingManager).load( 'textures/flashLightLamp.png' );
+							flashLightCircle = new THREE.Mesh( new THREE.CircleBufferGeometry( 1.75, 12 ), new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } ) );
+
+							flashLightCircle.position.x = i*20-4.235;
+							flashLightCircle.position.y = 2.2;
+							flashLightCircle.position.z = j*20-3.225;
+							flashLightCircle.rotateY(Math.PI*3/10)								
+
 							flashLightLamp.add(spotLight1);
 							flashLightLamp.add(spotLight2);
 							scene.add(flashLightBody);
 							scene.add(flashLightLamp);
-						}		
+							scene.add(flashLightCircle);
+						}
+
+						else if (coordinates[j] === 95) {
+							const boxGeometry = new THREE.BoxBufferGeometry( 64, 54, 3)
+							const wall_texture = new THREE.TextureLoader(loadingManager).load( 'textures/oldGate.jpg' );
+							wall_texture.wrapS = THREE.RepeatWrapping;
+							wall_texture.wrapT = THREE.RepeatWrapping;
+							wall_texture.repeat.set( 2, 1 );
+							const boxMaterial = 
+								[
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // TOP SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+									new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+								];
+
+							const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							box1.position.x = i*20;
+							box1.position.y = 28;
+							box1.position.z = j*20;
+							box1.rotateY(Math.PI/2)
+							
+							const collisionBox = new THREE.Box3();
+							collisionBox.setFromObject(box1);
+
+							const box = new THREE.Mesh( boxGeometry,  boxMaterial);
+
+							scene.add( box1 );	
+							objects.push( collisionBox );							
+						}
 
 						else if (coordinates[j] === 99) {
-							camera.position.set(i*20, 5, 20*j)
+							camera.position.set(i*20, 3, 20*j)
 						}																			
-
+ 
 					}
 				}
 
-				//
+				// rain
 
 				rainCount=900;
 				rainGeo = new THREE.Geometry();
@@ -1316,7 +1595,6 @@
 					'models/slenderman/SM Model.obj',
 					// called when resource is loaded
 					function ( slenderMan ) {
-						//object.position.lerp(camera, 0.95);
 						slenderMan.position.x = Math.floor(Math.random() * 400); 
 						slenderMan.position.y = 0;
 						slenderMan.position.z = Math.floor(Math.random() * 400); // começar do fundo de forma randomica
@@ -1328,21 +1606,20 @@
 
 						if ( child instanceof THREE.Mesh ) {
 							const slenderTexture = new THREE.TextureLoader(loadingManager).load( 'models/slenderman/slenderman_color.png' );			
-							child.material = new THREE.MeshStandardMaterial( {map: slenderTexture, fog: true} )
+							child.material = new THREE.MeshStandardMaterial( {map: slenderTexture, metalness: 0.95, fog: true} )
 							}
 						} );
 						
 						scene.add( slenderMan );
 						slenders.push(slenderMan);
 					}
-				);		
+				);
 
 				// flaslight
 
-				flashLight = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 6.5, 12), new THREE.MeshBasicMaterial({color:0x212121}));
+				flashLight = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 6.5, 12), new THREE.MeshBasicMaterial({color:0x1F1F1F}));
 				flashLight.rotateX(Math.PI/2);
 				flashLight.position.set(2,-3,0)
-				//camera.add(flashLight);
 
 				spotLight1 = new THREE.SpotLight(0xcccccc, 0.5, 150);
 				spotLight1.power = 3.65;
@@ -1362,7 +1639,7 @@
 				spotLight2.castShadow = true;
 				spotLight2.rotateX(Math.PI/2);
 
-				spotLight3 = new THREE.SpotLight(0xffffff, 0.5, 150); //5b5e52
+				spotLight3 = new THREE.SpotLight(0xffffff, 0.5, 150);
 				spotLight3.power = 5;
 				spotLight3.angle = 0.40;
 				spotLight3.decay = 6;
@@ -1436,7 +1713,7 @@
 				if( RESOURCES_LOADED == false ){
 					requestAnimationFrame(animate);					
 					renderer.render(loadingScreen.scene, loadingScreen.camera);
-					return; // Stop the function here.
+					return;
 				}
 
 				requestAnimationFrame( animate );
@@ -1477,15 +1754,21 @@
 					}
 
 					if (onWater) {
-						moveSpeed = baseMoveSpeed*6;				
+						moveSpeed = baseMoveSpeed*6;
+						flashLight.rotation.x = Math.PI/2;
 					}
-					else if (run && stamina > 1) {
-						moveSpeed = baseMoveSpeed*0.66;
-						stamina -= 1;
+					else if (run && stamina > 0.35) {
+						moveSpeed = baseMoveSpeed*0.55;
+						stamina -= 0.65;
+						if (stamina > 20) {
+							flashLight.rotation.x = Math.PI/4;											
+						} 
 					} else {
 						moveSpeed = baseMoveSpeed;
-						if(stamina <= 98.8) stamina += 0.055;
+						flashLight.rotation.x = Math.PI/2;
+						if(stamina <= 99.3) stamina += 0.07;
 					}
+					
 					velocity.x -= velocity.x * moveSpeed * delta; //movement speed
 					velocity.z -= velocity.z * moveSpeed * delta; //movement speed
 
@@ -1506,10 +1789,8 @@
 
 					// Prevent the camera/player from falling out of the 'world'
 					if ( controls.getObject().position.y < 18 ) {
-
 						velocity.y = 0;
 						controls.getObject().position.y = 18;
-
 					}					
 
 					for(var i = 0; i < objects.length; i++) {
@@ -1525,9 +1806,17 @@
 					if(lanternPicked === false)	{
 						if(interact === true && raycaster.ray.origin.distanceTo(flashLightBody.position) <= 30) {
 							console.log('Pegou')
+							
+							AudioLoader.load( 'sounds/flashLightClickSound.wav', function( buffer ) {
+								flashLightClickSound.setBuffer( buffer );
+								flashLightClickSound.setLoop( false);
+								flashLightClickSound.setVolume( 0.5 );
+								flashLightClickSound.play();
+								});							
 							camera.add(flashLight);
 							scene.remove(flashLightBody);
 							scene.remove(flashLightLamp);
+							scene.remove(flashLightCircle);
 							lanternPicked = true;
 						}
 					}
@@ -1538,7 +1827,7 @@
 						if ( aux.distanceTo(papers[i].position) <= 15 && interact === true) {
 							scene.remove(papers[i]);
 							papers.splice(papers.indexOf(papers[i]), 1);
-							const AudioLoader = new THREE.AudioLoader(loadingManager);							
+														
 							if(pageFlipSound.isPlaying === false)
 								AudioLoader.load( 'sounds/page_flip.mp3', function( buffer ) {
 									pageFlipSound.setBuffer( buffer );
@@ -1553,25 +1842,23 @@
 					}
 
 					if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 110) { 
-						console.log('Perto');
 
 						spotLight1.power = Math.floor(Math.random() * 6);
 						spotLight2.power = Math.floor(Math.random() * 5);
 						spotLight3.power = Math.floor(Math.random() * 10);
 						spotLight4.power = Math.floor(Math.random() * 9);					
 
-						if (raycaster.ray.origin.distanceTo(slenders[0].position) <  50) { //50
+						if (raycaster.ray.origin.distanceTo(slenders[0].position) <  0) { //50
 						
 							controls.disconnect();
-							camera.rotation.y = Math.atan2(( slenders[0].position.z - camera.position.z ) , ( slenders[0].position.x - camera.position.x ));
+							camera.target = slenders[0];
 							glitchPass.goWild = true;
-
-							const AudioLoader = new THREE.AudioLoader(loadingManager);
+							
 							if(slenderStaticSound.isPlaying === false)
 							AudioLoader.load( 'sounds/slender_static.mp3', function( buffer ) {
 								slenderStaticSound.setBuffer( buffer );
 								slenderStaticSound.setLoop( false );
-								slenderStaticSound.setVolume( 0.25 );
+								slenderStaticSound.setVolume( 0.3 );
 								slenderStaticSound.play();
 								document.removeEventListener('keydown', onKeyDown);
 								setTimeout(() => {  open(location, '_self').close(); }, 7500);
@@ -1583,19 +1870,17 @@
 						spotLight3.power = 5;
 						spotLight4.power = 2.65;						
 					}
-
 				}
 
 				origem = raycaster.ray.origin.clone();
 				origem.y -= 10;	
 
 				if(moveBackward || moveForward || moveLeft || moveRight) {
-					const AudioLoader = new THREE.AudioLoader(loadingManager);
 					if(stepSound.isPlaying === false) {
 					AudioLoader.load( 'sounds/step' + Math.floor(Math.random() * 2) + '.mp3', function( buffer ) {
 						stepSound.setBuffer( buffer );
 						stepSound.setLoop( false);
-						stepSound.setVolume( 0.425 );
+						stepSound.setVolume( 0.6 );
 						stepSound.play();
 						});
 					}
@@ -1607,15 +1892,14 @@
 				};
 
 				// slenderMan movimentation
-
-				slenders[0].rotation.y = Math.atan2(( camera.position.z - slenders[0].position.z ) , ( camera.position.x - slenders[0].position.x ));
-				slenders[0].position.lerp(camera.position, slenderSpeed)
+				if(lanternPicked) {
+					slenders[0].rotation.y = Math.atan2(( camera.position.z - slenders[0].position.z ) , ( camera.position.x - slenders[0].position.x ));
+					slenders[0].position.lerp(camera.position, slenderSpeed)
+				}
 				if (slenders[0].position. y > 1) slenders[0].position.y = 1;
-
 				//
 
 				prevTime = time;
-
 			composer.render( );
 			}
 

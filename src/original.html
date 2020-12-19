@@ -38,59 +38,34 @@
     		const axesHelper = new THREE.AxesHelper( 5 );
 			scene.add( axesHelper );
 
-			var geometry = new THREE.CircleBufferGeometry( 5, 20 );
-			water = new Water( geometry, {
-					color: params.color,
-					scale: params.scale,
-					flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
-					textureWidth: 1024,
-					textureHeight: 1024
-				} );
+			const mattressLoader = new THREE.OBJLoader();
+							let mattress;
+							// load a resource
+							mattressLoader.load(
+								// resource URL
+								'models/mattress/mattress.obj',
+								// called when resource is loaded
+								function ( mattress ) {
+									mattress.position.x = 0;
+									mattress.position.y = 5;
+									mattress.position.z = 0;		
+									mattress.rotateY(Math.PI)	
 
-			water.position.x = 4;
-			water.rotation.x = Math.PI * - 0.5;
-			scene.add( water );
+									mattress.scale.x = 0.05;
+									mattress.scale.y = 0.05;
+									mattress.scale.z = 0.05;
 
-			var geometry = new THREE.CircleBufferGeometry( 2, 20 );
-			water = new Water( geometry, {
-					color: params.color,
-					scale: params.scale,
-					flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
-					textureWidth: 1024,
-					textureHeight: 1024
-				} );
 
-			water.position.x = -2;
-			water.rotation.x = Math.PI * - 0.5;
-			scene.add( water );			
+									mattress.traverse( function ( child ) {
 
-			var geometry = new THREE.CircleBufferGeometry( 3, 20 );
-			water = new Water( geometry, {
-					color: params.color,
-					scale: params.scale,
-					flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
-					textureWidth: 1024,
-					textureHeight: 1024
-				} );
-
-			water.position.y = 2;
-			water.rotation.x = Math.PI * - 0.5;
-			scene.add( water );			
-
-			geometry = new THREE.CircleBufferGeometry( 3, 20 );
-			material = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide } );
-			const circle3 = new THREE.Mesh( geometry, material );
-			circle3.position.y = 2;
-
-			geometry = new THREE.CircleBufferGeometry( 4, 20 );
-			material = new THREE.MeshBasicMaterial( { color: 0x0000ff, side: THREE.DoubleSide } );
-			const circle4 = new THREE.Mesh( geometry, material );
-			circle4.position.y = -3;
-			circle4.position.x = 7;
-			scene.add( circle1 );
-			scene.add( circle2 );
-			scene.add( circle3 );
-			scene.add( circle4 );
+									if ( child instanceof THREE.Mesh ) {
+										const mattressTexture = new THREE.TextureLoader().load( 'models/mattress/mattressTexture.jpg' );			
+										child.material = new THREE.MeshBasicMaterial( {map: mattressTexture, side: THREE.DoubleSide} )
+										}
+									} );
+									scene.add( mattress )
+								}
+							);
 
     		camera.position.z = 10
 
