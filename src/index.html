@@ -38,6 +38,7 @@
 		<script src="js/three.module.js"></script>
 		<script src="js/PointerLockControls.js"></script>
 		<script src="js/OBJLoader.js"></script>
+		<script src="js/MTLLoader.js"></script>
 		<script src="js/EffectComposer.js"></script>
 		<script src="js/ShaderPass.js"></script>
 		<script src="js/CopyShader.js"></script>
@@ -67,7 +68,7 @@
 			const water = [];
 			let forestSound, stepSound, slenderStaticSound, pageFlipSound, rainSound, flashLightClickSound, gateClosingSound;
 			var slenderSpeed = 0.0;
-			var baseSlenderSpeed = 0;//0.0025;
+			var baseSlenderSpeed = 0.0025;
 			var collectPages = 0;
 			var inicialPapersLenght = 0;
 
@@ -92,6 +93,29 @@
 			};
 			var loadingManager = null;
 			var RESOURCES_LOADED = false;		
+
+			let isMobile;
+
+			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) 
+			{
+				window.alert("Mobile");
+				isMobile = true;
+			}
+			else
+			{
+				isMobile = false;
+			}
+			var elem = document.documentElement;
+
+			function openFullscreen() {
+				if (elem.requestFullscreen) {
+					elem.requestFullscreen();
+				} else if (elem.webkitRequestFullscreen) { /* Safari */
+					elem.webkitRequestFullscreen();
+				} else if (elem.msRequestFullscreen) { /* IE11 */
+					elem.msRequestFullscreen();
+				}
+			}
 
 			init();
 			animate();
@@ -152,6 +176,8 @@
 					camera.add( listener );
 
 					if(gateClosed === false) {
+
+						openFullscreen();
 						gateClosingSound = new THREE.Audio( listener );
 						AudioLoader.load( 'sounds/gateClosingSound.mp3', function( buffer ) {
 						gateClosingSound.setBuffer( buffer );
@@ -160,7 +186,6 @@
 						gateClosingSound.play();
 						gateClosed = true;
 					});
-
 					}
 
 					forestSound = new THREE.Audio( listener );
@@ -1464,12 +1489,70 @@
 
 									if ( child instanceof THREE.Mesh ) {
 										const garbageCanTexture = new THREE.TextureLoader(loadingManager).load( 'models/garbage_can/garbage_can.png' );			
-										child.material = new THREE.MeshBasicMaterial( {map: garbageCanTexture, side: THREE.DoubleSide} )
+										child.material = new THREE.MeshStandardMaterial( {map: garbageCanTexture, side: THREE.DoubleSide} )
 										}
 									} );
 									scene.add( garbageCan );
 								}
 							);
+						}
+
+						else if (coordinates[j] === 44) {
+							const sinkLoader = new THREE.OBJLoader(loadingManager);
+							let sink;
+							// load a resource
+							sinkLoader.load(
+								// resource URL
+								'models/sink/sink.obj',
+								// called when resource is loaded
+								function ( sink ) {
+									sink.position.x = i*20;
+									sink.position.y = 2.5;
+									sink.position.z = j*20-632;
+
+									sink.scale.x = 0.1;
+									sink.scale.y = 0.1;
+									sink.scale.z = 0.1;
+
+									sink.traverse( function ( child ) {
+
+									if ( child instanceof THREE.Mesh ) {
+										const sinkTexture = new THREE.TextureLoader(loadingManager).load( 'models/sink/sinkTexture.png' );			
+										child.material = new THREE.MeshStandardMaterial( {map: sinkTexture, side: THREE.DoubleSide} )
+										}
+									} );
+									scene.add( sink );
+								}
+							);
+						}
+						
+						else if (coordinates[j] === 45) {
+							new THREE.MTLLoader( loadingManager )
+							.setPath( 'models/pencil/' )
+							.load( 'Pencil.mtl', function ( materials ) {
+
+								materials.preload();
+
+								new THREE.OBJLoader( loadingManager )
+									.setMaterials( materials )
+									.setPath( 'models/pencil/' )
+									.load( 'Pencil.obj', function ( object ) {
+
+										object.position.x = i*20;
+										object.position.y = 4.5;
+										object.position.z = j*20-651;
+										
+										object.rotateX(Math.PI*3/2);
+										object.rotateZ(Math.PI/3)
+
+										object.scale.x = 0.005;
+										object.scale.y = 0.005;
+										object.scale.z = 0.005;
+										scene.add( object );
+
+									});
+
+							} );
 						}
 
 						else if (coordinates[j] === 30) {
@@ -1606,7 +1689,7 @@
 
 						if ( child instanceof THREE.Mesh ) {
 							const slenderTexture = new THREE.TextureLoader(loadingManager).load( 'models/slenderman/slenderman_color.png' );			
-							child.material = new THREE.MeshStandardMaterial( {map: slenderTexture, metalness: 0.95, fog: true} )
+							child.material = new THREE.MeshStandardMaterial( {map: slenderTexture, metalness: 0.85, fog: true} )
 							}
 						} );
 						
@@ -1712,7 +1795,7 @@
 				// This block runs while resources are loading.
 				if( RESOURCES_LOADED == false ){
 					requestAnimationFrame(animate);					
-					renderer.render(loadingScreen.scene, loadingScreen.camera);
+					composer.render(loadingScreen.scene, loadingScreen.camera);
 					return;
 				}
 
@@ -1720,32 +1803,30 @@
 
 				const time = performance.now();
 
-				rainGeo.vertices.forEach(p => {
+				if ( controls.isLocked === true ) {
+
+					rainGeo.vertices.forEach(p => {
 					p.velocity -= 0.1 + Math.random() * 0.1;
 					p.y += p.velocity;
-					if (p.y < -200) {
+					if (p.y < -50) {
 						p.y = 200;
 						p.velocity = 0;
 					}
-				});
-				rainGeo.verticesNeedUpdate = true;
-				rain.rotation.y +=0.002;
-
-				if ( controls.isLocked === true ) {
+					});
+					rainGeo.verticesNeedUpdate = true;
+					rain.rotation.y +=0.002;
 
 					raycaster.ray.origin.copy( controls.getObject().position ); // localização
-					raycaster.ray.origin.y += 10; // localização
+					raycaster.ray.origin.y += 18; // localização
 
-					rain.position.x = raycaster.ray.origin.x;
-					rain.position.z = raycaster.ray.origin.z;
+					rain.position.x = camera.position.x;
+					rain.position.z = camera.position.z;
 
 					const delta = ( time - prevTime ) / 1000;
 
 					// Set the velocity.x and velocity.z using the calculated time delta
-					for(var i = 0; i < water.length; i++) {
-						var aux = raycaster.ray.origin.clone();
-						aux.y = 0; // rever						
-						if ( raycaster.ray.origin.distanceTo(water[i].position) <= 35) {							
+					for(var i = 0; i < water.length; i++) {	
+						if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - water[i].position.x, 2) + Math.pow(raycaster.ray.origin.z - water[i].position.z, 2)) <= 20) {							
 							onWater = true;
 							break;
 						} else {
@@ -1772,8 +1853,6 @@
 					velocity.x -= velocity.x * moveSpeed * delta; //movement speed
 					velocity.z -= velocity.z * moveSpeed * delta; //movement speed
 
-					velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass rever
-
 					direction.z = Number( moveForward ) - Number( moveBackward ); // rever
 					direction.x = Number( moveRight ) - Number( moveLeft ); // rever
 					direction.normalize(); // this ensures consistent movements in all directions
@@ -1784,8 +1863,6 @@
 
 					controls.moveRight( - velocity.x * delta );
 					controls.moveForward( - velocity.z * delta );
-
-					controls.getObject().position.y += ( velocity.y * delta ); // new behavior rever
 
 					// Prevent the camera/player from falling out of the 'world'
 					if ( controls.getObject().position.y < 18 ) {
@@ -1804,9 +1881,7 @@
 					}
 
 					if(lanternPicked === false)	{
-						if(interact === true && raycaster.ray.origin.distanceTo(flashLightBody.position) <= 30) {
-							console.log('Pegou')
-							
+						if(interact === true && Math.sqrt(Math.pow(raycaster.ray.origin.x - flashLightBody.position.x, 2) + Math.pow(raycaster.ray.origin.z - flashLightBody.position.z, 2)) <= 15) {	
 							AudioLoader.load( 'sounds/flashLightClickSound.wav', function( buffer ) {
 								flashLightClickSound.setBuffer( buffer );
 								flashLightClickSound.setLoop( false);
@@ -1822,9 +1897,7 @@
 					}
 
 					for(var i = 0; i < papers.length; i++) {
-						var aux = raycaster.ray.origin.clone();
-						aux.y = 10; // rever
-						if ( aux.distanceTo(papers[i].position) <= 15 && interact === true) {
+						if ( interact === true && (Math.sqrt(Math.pow(raycaster.ray.origin.x - papers[i].position.x, 2) + Math.pow(raycaster.ray.origin.z - papers[i].position.z, 2))) <= 6) {
 							scene.remove(papers[i]);
 							papers.splice(papers.indexOf(papers[i]), 1);
 														
@@ -1840,18 +1913,19 @@
 							pages.innerHTML = collectPages + "/" + inicialPapersLenght;
 						}
 					}
-
-					if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 110) { 
+					
+					console.log(Math.sqrt(Math.pow(raycaster.ray.origin.x - slenders[0].position.x, 2) + Math.pow(raycaster.ray.origin.z - slenders[0].position.z, 2)))
+					if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - slenders[0].position.x, 2) + Math.pow(raycaster.ray.origin.z - slenders[0].position.z, 2)) < 110) { 
 
 						spotLight1.power = Math.floor(Math.random() * 6);
 						spotLight2.power = Math.floor(Math.random() * 5);
 						spotLight3.power = Math.floor(Math.random() * 10);
 						spotLight4.power = Math.floor(Math.random() * 9);					
 
-						if (raycaster.ray.origin.distanceTo(slenders[0].position) <  0) { //50
+						if (Math.sqrt(Math.pow(raycaster.ray.origin.x - slenders[0].position.x, 2) + Math.pow(raycaster.ray.origin.z - slenders[0].position.z, 2)) <  50) { //50
 						
 							controls.disconnect();
-							camera.target = slenders[0];
+							camera.lookAt(slenders[0].up);
 							glitchPass.goWild = true;
 							
 							if(slenderStaticSound.isPlaying === false)
@@ -1873,7 +1947,7 @@
 				}
 
 				origem = raycaster.ray.origin.clone();
-				origem.y -= 10;	
+				origem.y -= 18;	
 
 				if(moveBackward || moveForward || moveLeft || moveRight) {
 					if(stepSound.isPlaying === false) {
@@ -1900,7 +1974,7 @@
 				//
 
 				prevTime = time;
-			composer.render( );
+				composer.render(scene, camera);
 			}
 
 		</script>

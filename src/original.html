@@ -14,6 +14,7 @@
     	<script src="js/three.js"></script>
 		<script src="js/OrbitControls.js"></script>
 		<script src="js/OBJLoader.js"></script>
+		<script src="js/SVGLoader.js"></script>
 
     	<script>
     		(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
@@ -38,32 +39,32 @@
     		const axesHelper = new THREE.AxesHelper( 5 );
 			scene.add( axesHelper );
 
-			const mattressLoader = new THREE.OBJLoader();
-							let mattress;
+			const x = 0, y = 0;
+
+			  const garbageCanLoader = new THREE.OBJLoader();
+							let garbageCan;
 							// load a resource
-							mattressLoader.load(
+							garbageCanLoader.load(
 								// resource URL
-								'models/mattress/mattress.obj',
+								'models/untitled.obj',
 								// called when resource is loaded
-								function ( mattress ) {
-									mattress.position.x = 0;
-									mattress.position.y = 5;
-									mattress.position.z = 0;		
-									mattress.rotateY(Math.PI)	
+								function ( garbageCan ) {
+									garbageCan.position.x = 0;
+									garbageCan.position.y = 0;
+									garbageCan.position.z = 0;	
 
-									mattress.scale.x = 0.05;
-									mattress.scale.y = 0.05;
-									mattress.scale.z = 0.05;
+									garbageCan.scale.x = 0.01;
+									garbageCan.scale.y = 0.01;
+									garbageCan.scale.z = 0.01;
 
-
-									mattress.traverse( function ( child ) {
+									garbageCan.traverse( function ( child ) {
 
 									if ( child instanceof THREE.Mesh ) {
-										const mattressTexture = new THREE.TextureLoader().load( 'models/mattress/mattressTexture.jpg' );			
-										child.material = new THREE.MeshBasicMaterial( {map: mattressTexture, side: THREE.DoubleSide} )
+										//const garbageCanTexture = new THREE.TextureLoader(loadingManager).load( 'textures/black_water.jpg' );			
+										child.material = new THREE.MeshBasicMaterial( {color:0xff0ff, side: THREE.DoubleSide} )
 										}
 									} );
-									scene.add( mattress )
+									scene.add( garbageCan );
 								}
 							);
 
