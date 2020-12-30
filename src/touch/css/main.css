@@ -1,10 +1,8 @@
-body {
-	-webkit-user-select: none;
-}
-
 #container {
 	position: relative;
-	top: 10px;
+	margin: auto;
+	width: 50%;
+	top: 400px;
 }
 
 #container3d canvas {

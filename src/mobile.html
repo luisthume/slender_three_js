@@ -4,20 +4,25 @@
 		<title>Slenderman</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="touch/css/touch-pad.css">
+		<link rel="stylesheet" href="touch/css/main.css">
         <style>
         	body { margin: 0; }
         	canvas { width: 100%; height:100%;};
 		</style>
 	</head>
-	<body>	
-		<section id="loading-screen">
-			<div id="loader"></div>
-		</section>
+	<body>          
+        <div id="container">
+            <div id="container3d"></div>
+        </div>  
 		<div id="gameover">
 			<br /><br />
 			<span style="font-size:60px;color:#8d1212">Thank you for the pages</span>
 		</div>
+		<section id="loading-screen">
+			<div id="loader"></div>
+		</section>  
 		<div id="blocker">
 			<div id="instructions">
 				<span style="font-size:52px;color:#8d1212">Collect the pages to escape</span>
@@ -27,35 +32,34 @@
 				<span style="font-size:30px">Move: WASD<br/>
 				Look: MOUSE<br/>
 				E: COLLECT PAGE<br/>
-				Shift: RUN</span>
+                Shift: RUN</span>  
 			</div>
-		</div>
+        </div>     
 		<div id="pages">
 			<span></span>
-		</div>
-		<div style="position: relative;" id="container">
-			<div style="position: relative;" id="container3d"></div>
-		</div>	
+        </div>           
 
 		<script src="js/three.js"></script>
 		<script src="js/three.module.js"></script>
 		<script src="js/PointerLockControls.js"></script>
 		<script src="js/OBJLoader.js"></script>
+		<script src="js/MTLLoader.js"></script>
 		<script src="js/EffectComposer.js"></script>
 		<script src="js/ShaderPass.js"></script>
 		<script src="js/CopyShader.js"></script>
 		<script src="js/RenderPass.js"></script>
 		<script src="js/GlitchPass.js"></script>
-		<script src="js/DigitalGlitch.js"></script>
+        <script src="js/DigitalGlitch.js"></script>
+        
 
 		<script type="text/javascript" src="touch/js/movement-pad.js"></script>
 		<script type="text/javascript" src="touch/js/rotation-pad.js"></script>
 		<script type="text/javascript" src="touch/js/touch-controls.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>		
-		
+
 		<script src="maps.js" charset="UTF-8"></script>
-		
 		<script type="module">
+			//(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
 			let camera, scene, renderer, controls, flashLight, spotLight1, spotLight2, spotLight3, spotLight4,slenderMan, origem, composer, glitchPass, onKeyDown, moveSpeed, rustedCar;
 			let raycaster;
 
@@ -90,7 +94,7 @@
 			const velocity = new THREE.Vector3();
 			const direction = new THREE.Vector3();
 			const vertex = new THREE.Vector3();
-			const color = new THREE.Color();
+            const color = new THREE.Color();
 
 			var coordArray = getMap();
 
@@ -100,7 +104,9 @@
 			};
 			var loadingManager = null;
 			var RESOURCES_LOADED = false;		
-			var container = $("#container3d");
+
+            var container = $("#container3d");          
+
 			var elem = document.documentElement;
 
 			function openFullscreen() {
@@ -111,15 +117,22 @@
 				} else if (elem.msRequestFullscreen) { /* IE11 */
 					elem.msRequestFullscreen();
 				}
-			}
-
-			var options = {
-					speedFactor: 0.1,
+            }
+            
+			function addControls() {
+				// Camera
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.6, 1000 );
+				// Controls
+				var options = {
+					speedFactor: 0.15,
 					delta: 1,
-					rotationFactor: 0.003,
+					rotationFactor: 0.004,
 					maxPitch: 55,
 					hitTest: false
 				};
+				controls = new TouchControls(container.parent(), camera, options);
+				controls.addToScene(scene);
+			}            
 
 			init();
 			animate();
@@ -143,27 +156,32 @@
 					instructions.style.visibility = 'visible';
 				};
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.6, 1000 );
-				camera.position.set(850, 10, 560);
-				camera.rotation.y = -5;
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0xffffff, 2, 0 );
 
-				controls = new TouchControls(container.parent(), camera, options);
-				controls.addToScene(scene);
-
 				const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 1.00 );  // ( 0xeeeeff, 0x777788, 0.5 )
 				light.position.set( 0.5, 1, 0.75 );
-				//scene.add(light);
-
+				scene.add(light);
+				
 				const blocker = document.getElementById( 'blocker' );
 				const instructions = document.getElementById( 'instructions' );
 				const gameover = document.getElementById( 'gameover' );
-				const pages = document.getElementById( 'pages' );				
+				const pages = document.getElementById( 'pages' );			
+		
+				/*
+				const rotation_pad = document.getElementsByClassName( 'rotation-pad' )[0].style;
+				rotation_pad.left = window.innerWidth - 200 + "px";
 
-				instructions.addEventListener( 'click', function () {
+				console.log(rotation_pad)
+				document.getElementById( 'container' ).style.top = window.innerHeight - 80 + "px";
+				document.getElementById( 'container' ).style.left = 20 + "px";
+				*/
+
+				addControls();
+
+				// Permisão 
+				document.addEventListener( 'click', function () {
 
 					instructions.style.display = 'none';
 					blocker.style.display = 'none';
@@ -182,8 +200,7 @@
 						gateClosingSound.setVolume( 0.6 );
 						gateClosingSound.play();
 						gateClosed = true;
-					});
-
+						});
 					}
 
 					forestSound = new THREE.Audio( listener );
@@ -209,11 +226,8 @@
 					pageFlipSound = new THREE.Audio( listener );
 
 					slenderSpeed = baseSlenderSpeed + collectPages*0.0025;
-				}, false );
 
-				console.log(controls)
-				// Permisão 
-				console.log(container)
+				} );              
 
 				// floor
 
@@ -225,13 +239,10 @@
 				let position = floorGeometry.attributes.position;
 
 				for ( let i = 0, l = position.count; i < l; i ++ ) {
-
 					vertex.fromBufferAttribute( position, i );
-
 					vertex.x += Math.random() * 20 - 10;
 					vertex.y += Math.random() * 2;
 					vertex.z += Math.random() * 20 - 10;
-
 					position.setXYZ( i, vertex.x, vertex.y, vertex.z );
 
 				}
@@ -248,7 +259,7 @@
 				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				floor.position.x = 430;
 				floor.position.z = 540;
-				scene.add( floor );
+				scene.add( floor );		
 
 				// objects
 
@@ -273,7 +284,7 @@
 							objects.push( box );
 						}
 
-						else if (coordinates[j] === 2) {
+						else if (coordinates[j] === 2) { //container
 
 							const containerLenght = 80;
 							const containerHeight = 50;
@@ -330,7 +341,7 @@
 
 						}
 
-						else if (coordinates[j] === 5) {
+						else if (coordinates[j] === 5) { //crossed walls
 							const boxGeometry = new THREE.BoxBufferGeometry( 80, 40, 3)
 							const wall_texture = new THREE.TextureLoader(loadingManager).load( 'textures/wall.jpg' );
 							const wall_texture2 = new THREE.TextureLoader(loadingManager).load( 'textures/wall.jpg' );
@@ -373,7 +384,7 @@
 							objects.push( collisionBox2 );							
 						}
 
-						else if (coordinates[j] === 6) {
+						else if (coordinates[j] === 6) { //página
 							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
 							const paper_texture = new THREE.TextureLoader(loadingManager).load( 'textures/page1.jpeg' );
 							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
@@ -391,11 +402,11 @@
 							papers.push(plane);
 						}
 
-						else if (coordinates[j] === 7) {
+						else if (coordinates[j] === 7) { //página
 							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
 							const paper_texture = new THREE.TextureLoader(loadingManager).load( 'textures/page2.jpeg' );
 							paper_texture.roation = Math.PI/2
-							const planeMaterial = new THREE.MeshStandardMaterial( {map: paper_texture, side: THREE.DoubleSide} );
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
 							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
 
 							plane.position.x = i*20+7;
@@ -410,7 +421,7 @@
 							papers.push(plane);
 						}			
 
-						else if (coordinates[j] === 8) {
+						else if (coordinates[j] === 8) { //página
 							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
 							const paper_texture = new THREE.TextureLoader(loadingManager).load( 'textures/page3.jpeg' );			
 							paper_texture.roation = Math.PI/2
@@ -418,7 +429,7 @@
 							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
 
 							plane.position.x = i*20+10;
-							plane.position.y = 12;
+							plane.position.y = 15;
 							plane.position.z = j*20+1.8;
 							plane.rotateX(Math.PI*2);
 
@@ -429,7 +440,7 @@
 							papers.push(plane);
 						}
 
-						else if (coordinates[j] === 9) {
+						else if (coordinates[j] === 9) { //página
 							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
 							const paper_texture = new THREE.TextureLoader(loadingManager).load( 'textures/page4.jpeg' );
 							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
@@ -448,7 +459,8 @@
 							papers.push(plane);
 						}
 
-						else if (coordinates[j] === 10) {
+						else if (coordinates[j] === 10) { //página
+							
 							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
 							const paper_texture = new THREE.TextureLoader(loadingManager).load( 'textures/page5.jpeg' );			
 							paper_texture.roation = Math.PI/2
@@ -456,9 +468,10 @@
 							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
 
 							plane.position.x = i*20;
-							plane.position.y = 2;
-							plane.position.z = j*20;
+							plane.position.y = 9.6;
+							plane.position.z = j*20+10;
 							plane.rotateX(Math.PI*3/2);
+							plane.rotateZ(Math.PI*1/7);
 
 							const box = new THREE.Box3();
 							box.setFromObject(plane);
@@ -467,7 +480,7 @@
 							papers.push(plane);
 						}												
 
-						else if (coordinates[j] === 11) {
+						else if (coordinates[j] === 11) { //bathroom
 							var boxGeometry = new THREE.BoxBufferGeometry( 45, 35, 3)
 							var wall_texture = new THREE.TextureLoader(loadingManager).load( 'textures/bathroom_wall.png' );
 							wall_texture.wrapS = THREE.RepeatWrapping;
@@ -1045,50 +1058,44 @@
 
 						}
 
-						else if (coordinates[j] === 12) {
+						else if (coordinates[j] === 12) { //black water
+							const aux = j;
+							new THREE.OBJLoader(loadingManager).load(
+								// resource URL
+								'models/agua2.obj',
+								// called when resource is loaded
+								function ( object ) {
+									const scale = 13;
+									object.scale.x = scale;
+									object.scale.y = scale;
+									object.scale.z = scale;
 
-							const height = 2.2;
-							const materialType = THREE.MeshLambertMaterial;
-							const color = 0x2389da;
-							const texture = new THREE.TextureLoader(loadingManager).load( 'textures/black_water.jpg' );		
-							const scale = 20;
+									object.traverse( function ( child ) {
 
-							var geometry = new THREE.CircleBufferGeometry( 4 + scale, 16 );
-							var material = new materialType( { map: texture } );
-							var circle = new THREE.Mesh( geometry, material );
+									if ( child instanceof THREE.Mesh ) {
+										child.material = new THREE.MeshBasicMaterial( {color: 0x090909, side: THREE.DoubleSide} ) //0x090909
+										}
+									} );
 
-							circle.position.x = i*20+15;
-							circle.position.y = height;
-							circle.position.z = j*20;							
-							circle.rotation.x = Math.PI * - 0.5;
-							scene.add( circle );
-							water.push( circle );
+									object.position.x = i*20;
+									object.position.y = 12;
+									object.position.z = aux*20;
 
-							geometry = new THREE.CircleBufferGeometry( 2 + scale, 16 );
-							material = new materialType( { map: texture } );
-							circle = new THREE.Mesh( geometry, material );
+									scene.add( object );
+									const geometry = new THREE.CircleBufferGeometry( scale + 24, 12 );
+									const circle = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 
-							circle.position.x = i*20-12;
-							circle.position.y = height;
-							circle.position.z = j*20+8;
-							circle.rotation.x = Math.PI * - 0.5;
-							scene.add( circle );
-							water.push( circle );
+									circle.position.x = i*20;
+									circle.position.y = 4;
+									circle.position.z = aux*20;
+									circle.rotation.x = Math.PI * - 0.5;
 
-							geometry = new THREE.CircleBufferGeometry( 3 + scale, 16 );
-							material = new materialType( { map: texture } );
-							circle = new THREE.Mesh( geometry, material );
+									water.push(circle);
+								}
+							);
+						}	
 
-							circle.position.x = i*20+5;
-							circle.position.y = height;
-							circle.position.z = j*20+8;
-							circle.rotation.x = Math.PI * - 0.5;
-							scene.add( circle );
-							water.push( circle );	
-		
-						}
-
-						else if (coordinates[j] === 13) {
+						else if (coordinates[j] === 13) { //tunnel
 
 							const tunnelLenght = 200;
 							const tunnelRad = 45;
@@ -1160,7 +1167,7 @@
 							scene.add( cylinder4 );	
 						}
 
-						else if (coordinates[j] === 14) {
+						else if (coordinates[j] === 14) { //poço
 
 						const tunnelLenght = 20;
 						const tunnelRad = 12
@@ -1253,7 +1260,7 @@
 						objects.push(collisionBox2);
 						}
 
-						else if (coordinates[j] === 40) {
+						else if (coordinates[j] === 40) { //magic cube
 							const scale = 2;
 							const boxGeometry = new THREE.BoxBufferGeometry( scale, scale, scale)
 							const red_texture = new THREE.TextureLoader(loadingManager).load( 'textures/magic_cube/red_cube.jpeg' );
@@ -1282,7 +1289,7 @@
 							scene.add(box1);
 						}	
 
-						else if (coordinates[j] === 41) {
+						else if (coordinates[j] === 41) { //clown box
 							const scale = 3.2;
 							const x = -12;
 							const z = -8;
@@ -1345,7 +1352,7 @@
 							scene.add(cylinder3);
 						}							
 
-						else if (coordinates[j] === 42) {
+						else if (coordinates[j] === 42) { //mattress
 							const mattressLoader = new THREE.OBJLoader(loadingManager);
 							let mattress;
 							// load a resource
@@ -1376,7 +1383,7 @@
 							);
 						}
 
-						else if (coordinates[j] === 43) {
+						else if (coordinates[j] === 43) { //garbage can
 							const garbageCanLoader = new THREE.OBJLoader(loadingManager);
 							let garbageCan;
 							// load a resource
@@ -1407,7 +1414,99 @@
 							);
 						}
 
-						else if (coordinates[j] === 30) {
+						else if (coordinates[j] === 44) { //sink
+							const sinkLoader = new THREE.OBJLoader(loadingManager);
+							let sink;
+							// load a resource
+							sinkLoader.load(
+								// resource URL
+								'models/sink/sink.obj',
+								// called when resource is loaded
+								function ( sink ) {
+									sink.position.x = i*20;
+									sink.position.y = 2.5;
+									sink.position.z = j*20-632;
+
+									sink.scale.x = 0.1;
+									sink.scale.y = 0.1;
+									sink.scale.z = 0.1;
+
+									sink.traverse( function ( child ) {
+
+									if ( child instanceof THREE.Mesh ) {
+										const sinkTexture = new THREE.TextureLoader(loadingManager).load( 'models/sink/sinkTexture.png' );			
+										child.material = new THREE.MeshStandardMaterial( {map: sinkTexture, side: THREE.DoubleSide} )
+										}
+									} );
+									scene.add( sink );
+								}
+							);
+						}
+						
+						else if (coordinates[j] === 45) { //pencil
+							new THREE.MTLLoader( loadingManager )
+							.setPath( 'models/pencil/' )
+							.load( 'Pencil.mtl', function ( materials ) {
+
+								materials.preload();
+
+								new THREE.OBJLoader( loadingManager )
+									.setMaterials( materials )
+									.setPath( 'models/pencil/' )
+									.load( 'Pencil.obj', function ( object ) {
+
+										object.position.x = i*20;
+										object.position.y = 4.5;
+										object.position.z = j*20-651;
+										
+										object.rotateX(Math.PI*3/2);
+										object.rotateZ(Math.PI/3)
+
+										object.scale.x = 0.005;
+										object.scale.y = 0.005;
+										object.scale.z = 0.005;
+										scene.add( object );
+
+									});
+
+							} );
+						}
+
+						else if (coordinates[j] === 46) { //bench
+							// load a resource
+							const aux = j;
+							new THREE.OBJLoader(loadingManager).load(
+								// resource URL
+								'models/bench/BenchOBJ.obj',
+								// called when resource is loaded
+								function ( object ) {
+									object.position.x = i*20;
+									object.position.y = 1;
+									object.position.z = aux*20;
+
+									object.rotateY(Math.PI/2);
+
+									object.scale.x = 16;
+									object.scale.y = 16;
+									object.scale.z = 16;
+
+									object.traverse( function ( child ) {
+									if ( child instanceof THREE.Mesh ) {
+										child.material = new THREE.MeshStandardMaterial( {map: new THREE.TextureLoader(loadingManager).load( 'models/bench/BenchOBJ.png' ), side: THREE.DoubleSide} )
+										}
+									} );
+
+									const collisionBox2 = new THREE.Box3();
+									collisionBox2.setFromObject(object);
+
+									scene.add( object );
+									objects.push(collisionBox2)
+									
+								}
+							);
+						}
+
+						else if (coordinates[j] === 30) { //flashlight
 							const flashLightColor = 0x1F1F1F;
 
 							flashLightBody = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 6.5, 12), new THREE.MeshBasicMaterial({color:flashLightColor}));
@@ -1455,7 +1554,28 @@
 							scene.add(flashLightCircle);
 						}
 
-						else if (coordinates[j] === 95) {
+						else if (coordinates[j] === 60) { //página
+							
+							const planeGeometry = new THREE.PlaneGeometry( 2.5, 4)
+							const paper_texture = new THREE.TextureLoader(loadingManager).load( 'textures/page5.jpeg' );			
+							paper_texture.roation = Math.PI/2
+							const planeMaterial = new THREE.MeshPhongMaterial( {map: paper_texture, side: THREE.DoubleSide} );
+							const plane = new THREE.Mesh( planeGeometry,  planeMaterial);
+
+							plane.position.x = i*20;
+							plane.position.y = 4.7;
+							plane.position.z = j*20-68;
+							plane.rotateX(Math.PI*3/2);
+							plane.rotateZ(Math.PI*1/7);
+
+							const box = new THREE.Box3();
+							box.setFromObject(plane);
+
+							scene.add( plane );	
+							papers.push(plane);
+						}	
+
+						else if (coordinates[j] === 95) { //gate
 							const boxGeometry = new THREE.BoxBufferGeometry( 64, 54, 3)
 							const wall_texture = new THREE.TextureLoader(loadingManager).load( 'textures/oldGate.jpg' );
 							wall_texture.wrapS = THREE.RepeatWrapping;
@@ -1488,7 +1608,8 @@
 						}
 
 						else if (coordinates[j] === 99) {
-							camera.position.set(i*20, 3, 20*j)
+							controls.fpsBody.position.set(i*20, 18, 20*j);
+							controls.fpsBody.rotation.set(0, -5, 0);
 						}																			
  
 					}
@@ -1530,7 +1651,7 @@
 					'models/slenderman/SM Model.obj',
 					// called when resource is loaded
 					function ( slenderMan ) {
-						slenderMan.position.x = Math.floor(Math.random() * 400); 
+						slenderMan.position.x = Math.floor(Math.random() * 400);
 						slenderMan.position.y = 0;
 						slenderMan.position.z = Math.floor(Math.random() * 400); // começar do fundo de forma randomica
 						slenderMan.scale.x = 11;
@@ -1541,7 +1662,7 @@
 
 						if ( child instanceof THREE.Mesh ) {
 							const slenderTexture = new THREE.TextureLoader(loadingManager).load( 'models/slenderman/slenderman_color.png' );			
-							child.material = new THREE.MeshStandardMaterial( {map: slenderTexture, metalness: 0.95, fog: true} )
+							child.material = new THREE.MeshStandardMaterial( {map: slenderTexture, metalness: 0.85, fog: true} )
 							}
 						} );
 						
@@ -1608,7 +1729,6 @@
 				
 				// moon
 
-				const height = 2.2;
 				const moonTexture = new THREE.TextureLoader(loadingManager).load( 'textures/moon.png' );		
 				const scale = 4;
 
@@ -1628,7 +1748,6 @@
 				glitchPass = new THREE.GlitchPass();
 				composer.addPass( glitchPass );	
 
-				container.append(composer.domElement);
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -1638,10 +1757,12 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
+			console.log(controls)
 			function animate() {
 
 				// This block runs while resources are loading.
@@ -1651,171 +1772,157 @@
 					return;
 				}
 
-				requestAnimationFrame( animate );
+                requestAnimationFrame( animate );
+                
+                controls.update();
 
-				const time = performance.now();
+                var vector = new THREE.Vector3(controls.mouse.x, controls.mouse.y, 1);
+                vector.unproject(camera);                  
 
-				rainGeo.vertices.forEach(p => {
-					p.velocity -= 0.1 + Math.random() * 0.1;
-					p.y += p.velocity;
-					if (p.y < -200) {
-						p.y = 200;
-						p.velocity = 0;
-					}
-				});
-				rainGeo.verticesNeedUpdate = true;
-				rain.rotation.y +=0.002;
+                rainGeo.vertices.forEach(p => {
+                p.velocity -= 0.1 + Math.random() * 0.1;
+                p.y += p.velocity;
+                if (p.y < -50) {
+                    p.y = 200;
+                    p.velocity = 0;
+                }
+                });
+                rainGeo.verticesNeedUpdate = true;
+                rain.rotation.y +=0.002;
 
-				controls.update();
+                raycaster = new THREE.Raycaster( controls.fpsBody.position, vector.sub(controls.fpsBody.position).normalize() );			
 
-				var vector = new THREE.Vector3(controls.mouse.x, controls.mouse.y, 1);
-				vector.unproject(camera);
+                rain.position.x = camera.position.x;
+                rain.position.z = camera.position.z;
 
-				var raycaster = new THREE.Raycaster( controls.fpsBody.position, vector.sub(controls.fpsBody.position).normalize() );
+                // Set the velocity.x and velocity.z using the calculated time delta
+                for(var i = 0; i < water.length; i++) {	
+                    if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - water[i].position.x, 2) + Math.pow(raycaster.ray.origin.z - water[i].position.z, 2)) <= 26) {							
+                        onWater = true;
+                        break;
+                    } else {
+                        onWater = false;
+                    }
+                }
 
-				rain.position.x = camera.position.x;
-				rain.position.z = camera.position.z;
+                if (onWater) {
+                    moveSpeed = baseMoveSpeed*6;
+                    flashLight.rotation.x = Math.PI/2;
+                }
+                else if (run && stamina > 0.35) {
+                    moveSpeed = baseMoveSpeed*0.55;
+                    stamina -= 0.65;
+                    if (stamina > 20) {
+                        flashLight.rotation.x = Math.PI/4;											
+                    } 
+                } else {
+                    moveSpeed = baseMoveSpeed;
+                    flashLight.rotation.x = Math.PI/2;
+                    if(stamina <= 99.3) stamina += 0.07;
+                }
 
-				for(var i = 0; i < water.length; i++) {
-					var aux = raycaster.ray.origin.clone();
-					aux.y = 0; // rever						
-					if ( raycaster.ray.origin.distanceTo(water[i].position) <= 35) {							
-						onWater = true;
-						break;
-					} else {
-						onWater = false;
-					}
-				}
+                // Prevent the camera/player from falling out of the 'world'
+                if ( raycaster.ray.origin.y < 18 ) {
+                    controls.setPosition(raycaster.ray.origin.x, 18, raycaster.ray.origin.z);
+                }					
 
-				if (onWater) {
-					moveSpeed = baseMoveSpeed*6;
-					flashLight.rotation.x = Math.PI/2;
-				}
-				else if (run && stamina > 0.35) {
-					moveSpeed = baseMoveSpeed*0.55;
-					stamina -= 0.65;
-					if (stamina > 20) {
-						flashLight.rotation.x = Math.PI/4;											
-					} 
-				} else {
-					moveSpeed = baseMoveSpeed;
-					flashLight.rotation.x = Math.PI/2;
-					if(stamina <= 99.3) stamina += 0.07;
-				}
+                for(var i = 0; i < objects.length; i++) {
+                    if ( raycaster.ray.intersectsBox( objects[i] ) === true) { 
+						console.log("Colisão");
+                        //controls.fpsBody.position.set(origem.x, origem.y, origem.z);
+                    }
+                }
 
-				// Prevent the camera/player from falling out of the 'world'
-				if ( controls.fpsBody.position.y < 18 ) {
-					velocity.y = 0;
-					controls.fpsBody.position.y = 18;
-				}					
+                if(lanternPicked === false)	{
+                    if(interact === true && Math.sqrt(Math.pow(raycaster.ray.origin.x - flashLightBody.position.x, 2) + Math.pow(raycaster.ray.origin.z - flashLightBody.position.z, 2)) <= 15) {	
+                        AudioLoader.load( 'sounds/flashLightClickSound.wav', function( buffer ) {
+                            flashLightClickSound.setBuffer( buffer );
+                            flashLightClickSound.setLoop( false);
+                            flashLightClickSound.setVolume( 0.5 );
+                            flashLightClickSound.play();
+                            });							
+                        camera.add(flashLight);
+                        scene.remove(flashLightBody);
+                        scene.remove(flashLightLamp);
+                        scene.remove(flashLightCircle);
+                        lanternPicked = true;
+                    }
+                }
 
-				for(var i = 0; i < objects.length; i++) {
-					if ( raycaster.ray.intersectsBox( objects[i] ) === true) { 
-						velocity.x = 0;
-						velocity.z = 0;
-						controls.fpsBody.position.x = origem.x;
-						controls.fpsBody.position.y = origem.y;
-						controls.fpsBody.position.z = origem.z;
-					}
-				}
+                for(var i = 0; i < papers.length; i++) {
+                    if ( interact === true && (Math.sqrt(Math.pow(raycaster.ray.origin.x - papers[i].position.x, 2) + Math.pow(raycaster.ray.origin.z - papers[i].position.z, 2))) <= 6) {
+                        scene.remove(papers[i]);
+                        papers.splice(papers.indexOf(papers[i]), 1);
+                                                    
+                        if(pageFlipSound.isPlaying === false)
+                            AudioLoader.load( 'sounds/page_flip.mp3', function( buffer ) {
+                                pageFlipSound.setBuffer( buffer );
+                                pageFlipSound.setLoop( false );
+                                pageFlipSound.setVolume( 0.4 );
+                                pageFlipSound.play();
+                            });
+                        collectPages += 1;
+                        slenderSpeed += 0.001;
+                        pages.innerHTML = collectPages + "/" + inicialPapersLenght;
+                    }
+                }
+                
+                if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - slenders[0].position.x, 2) + Math.pow(raycaster.ray.origin.z - slenders[0].position.z, 2)) < 110) { 
 
-				if(lanternPicked === false)	{
-					if(interact === true && raycaster.ray.origin.distanceTo(flashLightBody.position) <= 30) {
-						console.log('Pegou')
-						
-						AudioLoader.load( 'sounds/flashLightClickSound.wav', function( buffer ) {
-							flashLightClickSound.setBuffer( buffer );
-							flashLightClickSound.setLoop( false);
-							flashLightClickSound.setVolume( 0.5 );
-							flashLightClickSound.play();
-							});							
-						camera.add(flashLight);
-						scene.remove(flashLightBody);
-						scene.remove(flashLightLamp);
-						scene.remove(flashLightCircle);
-						lanternPicked = true;
-					}
-				}
+                    spotLight1.power = Math.floor(Math.random() * 6);
+                    spotLight2.power = Math.floor(Math.random() * 5);
+                    spotLight3.power = Math.floor(Math.random() * 10);
+                    spotLight4.power = Math.floor(Math.random() * 9);					
 
-				for(var i = 0; i < papers.length; i++) {
-					var aux = raycaster.ray.origin.clone();
-					aux.y = 10; // rever
-					if ( aux.distanceTo(papers[i].position) <= 15 && interact === true) {
-						scene.remove(papers[i]);
-						papers.splice(papers.indexOf(papers[i]), 1);
-													
-						if(pageFlipSound.isPlaying === false)
-							AudioLoader.load( 'sounds/page_flip.mp3', function( buffer ) {
-								pageFlipSound.setBuffer( buffer );
-								pageFlipSound.setLoop( false );
-								pageFlipSound.setVolume( 0.4 );
-								pageFlipSound.play();
-							});
-						collectPages += 1;
-						slenderSpeed += 0.001;
-						pages.innerHTML = collectPages + "/" + inicialPapersLenght;
-					}
-				}
+                    if (Math.sqrt(Math.pow(raycaster.ray.origin.x - slenders[0].position.x, 2) + Math.pow(raycaster.ray.origin.z - slenders[0].position.z, 2)) <  0) { //50
+                    
+                        controls.disconnect();
+                        camera.lookAt(slenders[0].up);
+                        glitchPass.goWild = true;
+                        
+                        if(slenderStaticSound.isPlaying === false)
+                            AudioLoader.load( 'sounds/slender_static.mp3', function( buffer ) {
+                            slenderStaticSound.setBuffer( buffer );
+                            slenderStaticSound.setLoop( false );
+                            slenderStaticSound.setVolume( 0.3 );
+                            slenderStaticSound.play();
+                            document.removeEventListener('keydown', onKeyDown);
+                            setTimeout(() => {  open(location, '_self').close(); }, 7500);
+                        });
+                    }
+                } else {
+                    spotLight1.power = 3.65;
+                    spotLight2.power = 1.65;
+                    spotLight3.power = 5;
+                    spotLight4.power = 2.65;						
+                }
 
-				if ( raycaster.ray.origin.distanceTo(slenders[0].position) < 110) { 
+                if(moveBackward || moveForward || moveLeft || moveRight) {
+                    if(stepSound.isPlaying === false) {
+                    AudioLoader.load( 'sounds/step' + Math.floor(Math.random() * 2) + '.mp3', function( buffer ) {
+                        stepSound.setBuffer( buffer );
+                        stepSound.setLoop( false);
+                        stepSound.setVolume( 0.6 );
+                        stepSound.play();
+                        });
+                    }
 
-					spotLight1.power = Math.floor(Math.random() * 6);
-					spotLight2.power = Math.floor(Math.random() * 5);
-					spotLight3.power = Math.floor(Math.random() * 10);
-					spotLight4.power = Math.floor(Math.random() * 9);					
+                if(papers.length <= 0) {
+                    gameover.style.visibility = 'visible';						
+                    slenderSpeed = 0.02;
+                };
 
-					if (raycaster.ray.origin.distanceTo(slenders[0].position) <  0) { //50
-					
-						camera.target = slenders[0];
-						glitchPass.goWild = true;
-						
-						if(slenderStaticSound.isPlaying === false)
-						AudioLoader.load( 'sounds/slender_static.mp3', function( buffer ) {
-							slenderStaticSound.setBuffer( buffer );
-							slenderStaticSound.setLoop( false );
-							slenderStaticSound.setVolume( 0.3 );
-							slenderStaticSound.play();
-							document.removeEventListener('keydown', onKeyDown);
-							setTimeout(() => {  open(location, '_self').close(); }, 7500);
-						});
-					}
-				} else {
-					spotLight1.power = 3.65;
-					spotLight2.power = 1.65;
-					spotLight3.power = 5;
-					spotLight4.power = 2.65;						
-				}
+                // slenderMan movimentation
+                if(lanternPicked) {
+                    slenders[0].rotation.y = Math.atan2(( camera.position.z - slenders[0].position.z ) , ( camera.position.x - slenders[0].position.x ));
+                    slenders[0].position.lerp(camera.position, slenderSpeed)
+                }
+                if (slenders[0].position. y > 1) slenders[0].position.y = 1;
+                }
+                //
+				origem = raycaster.ray.origin.clone();           
 
-				origem = raycaster.ray.origin.clone();
-				origem.y -= 10;	
-
-				if(moveBackward || moveForward || moveLeft || moveRight) {
-					if(stepSound.isPlaying === false) {
-					AudioLoader.load( 'sounds/step' + Math.floor(Math.random() * 2) + '.mp3', function( buffer ) {
-						stepSound.setBuffer( buffer );
-						stepSound.setLoop( false);
-						stepSound.setVolume( 0.6 );
-						stepSound.play();
-						});
-					}
-				}
-
-				if(papers.length <= 0) {
-					gameover.style.visibility = 'visible';						
-					slenderSpeed = 0.02;
-				};
-
-				// slenderMan movimentation
-				if(lanternPicked) {
-					slenders[0].rotation.y = Math.atan2(( camera.position.z - slenders[0].position.z ) , ( camera.position.x - slenders[0].position.x ));
-					slenders[0].position.lerp(camera.position, slenderSpeed)
-				}
-				if (slenders[0].position. y > 1) slenders[0].position.y = 1;
-				//
-
-				prevTime = time;
-				//console.log(raycaster.ray.origin)
-				composer.render( scene, camera);
+				composer.render(scene, camera);
 			}
 
 		</script>
