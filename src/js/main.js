@@ -10,8 +10,11 @@ let interact = false;
 let lanternPicked = false;
 let gateClosed = false;
 let canEscape = false;
+let rainOn = true;
+let rainSoundOn = true;
+let slenderOn = true;
 let gateCollision;
-let onWater, flashLightBody, flashLightLamp, flashLightCircle, spotLight1, spotLight2, spotLight3, spotLight4;
+let onWater, flashLightBody, flashLightLamp, flashLightCircle, spotLight1, spotLight2, spotLight3, spotLight4, light;
 
 const objects = [];
 const papers = [];
@@ -23,6 +26,16 @@ var slenderSpeed = 0.0;
 var baseSlenderSpeed = 0.00175; //velocidade inicial
 var collectPages = 0;
 var inicialPapersLenght = 0;
+var flashLightPower = 0;
+
+var forestSoundVolume = 0.25;
+var rainSoundVolume = 0.15;
+var gateClosingSoundVolume = 0.6;
+var forestSoundVolume = 0.25;
+var flashLightClickSoundVolume = 0.5;
+var pageFlipSoundVolume = 0.4;
+var slenderStaticSoundVolume = 0.5;
+var stepSoundVolume = 0.6;
 
 var baseMoveSpeed = 7.5; //maior mais devagar
 var stamina = 100;
@@ -58,6 +71,62 @@ function openFullscreen() {
     }
 }
 
+function loadSlender() {
+    const SlenderLoader = new THREE.OBJLoader(loadingManager);
+
+    SlenderLoader.load(
+        'models/slenderman/SM Model.obj',
+        function ( slenderMan ) {
+            slenderMan.position.x = Math.floor(Math.random() * 400);
+            slenderMan.position.y = 0;
+            slenderMan.position.z = Math.floor(Math.random() * 400); // começar do fundo de forma randomica
+            slenderMan.scale.x = 11;
+            slenderMan.scale.y = 11;
+            slenderMan.scale.z = 11;
+            slenderMan.rotateY(Math.PI*11/12) // rever
+            slenderMan.traverse( function ( child ) {
+            if ( child instanceof THREE.Mesh ) {
+                const slenderTexture = new THREE.TextureLoader(loadingManager).load( 'models/slenderman/slenderman_color.png' );			
+                child.material = new THREE.MeshStandardMaterial( {map: slenderTexture, metalness: 0.85, fog: true} )
+                }
+            } );						
+            scene.add( slenderMan );
+            slenders.push(slenderMan);
+        }
+    );    
+}
+
+function turnLightsOn() {
+    light.intensity = 0.75;
+}
+
+function turnLightsOff() {
+    light.intensity = 0.0;
+}
+
+function turnRainOff() {
+    rainOn = false;
+    rainSoundOn = false;
+    scene.remove(rain)
+}
+
+function turnRainOn() {
+    rainOn = true;
+    rainSoundOn = true;
+    scene.add(rain);
+}
+
+function turnSlenderOff() {
+    slenderOn = false;
+    scene.remove(slenders[0])
+}
+
+function turnSlenderOn() {
+    slenderOn = true;
+    slenders.shift();
+    loadSlender();
+}
+
 init();
 animate();
 
@@ -85,9 +154,9 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000000 );
 
-    const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 1.00 );  // ( 0xeeeeff, 0x777788, 0.5 )
+    light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.00 );  // ( 0xeeeeff, 0x777788, 0.5 )
     light.position.set( 0.5, 1, 0.75 );
-    //scene.add(light);
+    scene.add(light);
 
     controls = new THREE.PointerLockControls( camera, document.body );
     controls.speedFactor = mouseSpeed;
@@ -114,7 +183,7 @@ function init() {
             AudioLoader.load( 'sounds/gateClosingSound.mp3', function( buffer ) {
                 gateClosingSound.setBuffer( buffer );
                 gateClosingSound.setLoop( false );
-                gateClosingSound.setVolume( 0.6 );
+                gateClosingSound.setVolume(gateClosingSoundVolume);
                 gateClosingSound.play();
                 gateClosed = true;
             });
@@ -126,15 +195,17 @@ function init() {
         AudioLoader.load( 'sounds/forest.mp3', function( buffer ) {
             forestSound.setBuffer( buffer );
             forestSound.setLoop( true );
-            forestSound.setVolume( 0.25 );
+            forestSound.setVolume( forestSoundVolume );
             forestSound.play();
         });
-        AudioLoader.load( 'sounds/rain1.mp3', function( buffer ) {
-            rainSound.setBuffer( buffer );
-            rainSound.setLoop( true );
-            rainSound.setVolume( 0.15 );
-            rainSound.play();
-        });
+        if (rainSoundOn === true) {
+            AudioLoader.load( 'sounds/rain1.mp3', function( buffer ) {
+                rainSound.setBuffer( buffer );
+                rainSound.setLoop( true );
+                rainSound.setVolume( rainSoundVolume );
+                rainSound.play();
+            });
+        }
         // create a global audio source
         stepSound = new THREE.Audio( listener );
         slenderStaticSound = new THREE.Audio( listener );
@@ -147,8 +218,24 @@ function init() {
         blocker.style.display = 'block';
         instructions.style.display = '';
         forestSound.stop();
-        rainSound.stop();
+        if(rainSoundOn === true) rainSound.stop();
     } );
+
+    flashLightPowerRange = document.getElementById('flashLightPowerRange')
+    flashLightPowerRange.addEventListener('change', function() {
+        flashLightPower = flashLightPowerRange.value/20-1;
+    })
+
+    const volume = document.getElementById('volume')
+    volume.addEventListener('change', function() {
+        forestSoundVolume = (0.25 + volume.value/300);
+        if (rainSoundOn) rainSoundVolume = (0.15 + volume.value/300);
+        gateClosingSoundVolume = (0.6 + volume.value/300);
+        flashLightClickSoundVolume = (0.5 + volume.value/300);
+        pageFlipSoundVolume = (0.4 + volume.value/300);
+        slenderStaticSoundVolume = (0.5 + volume.value/300);
+        stepSoundVolume = (0.6 + volume.value/300);        
+    })    
 
     scene.add( controls.getObject() );
 
@@ -1522,7 +1609,7 @@ function init() {
                 flashLightLamp.rotateZ(Math.PI-Math.PI*3/10)	
 
                 spotLight1 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-                spotLight1.power = 3.65;
+                spotLight1.power = flashLightPower + 3.65;
                 spotLight1.angle = 0.55;
                 spotLight1.decay = 2;
                 spotLight1.penumbra = 0.1;
@@ -1530,7 +1617,7 @@ function init() {
                 spotLight1.castShadow = true;
 
                 spotLight2 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-                spotLight2.power = 1.65;
+                spotLight2.power = flashLightPower + 1.65;
                 spotLight2.angle = 0.65;
                 spotLight2.decay = 2;
                 spotLight2.penumbra = 0.1;
@@ -1642,28 +1729,7 @@ function init() {
 
     //slenderman
 
-    const SlenderLoader = new THREE.OBJLoader(loadingManager);
-
-    SlenderLoader.load(
-        'models/slenderman/SM Model.obj',
-        function ( slenderMan ) {
-            slenderMan.position.x = Math.floor(Math.random() * 400);
-            slenderMan.position.y = 0;
-            slenderMan.position.z = Math.floor(Math.random() * 400); // começar do fundo de forma randomica
-            slenderMan.scale.x = 11;
-            slenderMan.scale.y = 11;
-            slenderMan.scale.z = 11;
-            slenderMan.rotateY(Math.PI*11/12) // rever
-            slenderMan.traverse( function ( child ) {
-            if ( child instanceof THREE.Mesh ) {
-                const slenderTexture = new THREE.TextureLoader(loadingManager).load( 'models/slenderman/slenderman_color.png' );			
-                child.material = new THREE.MeshStandardMaterial( {map: slenderTexture, metalness: 0.85, fog: true} )
-                }
-            } );						
-            scene.add( slenderMan );
-            slenders.push(slenderMan);
-        }
-    );
+    loadSlender();
 
     // flaslight
 
@@ -1672,7 +1738,7 @@ function init() {
     flashLight.position.set(2,-3,0);
 
     spotLight1 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-    spotLight1.power = 3.65;
+    spotLight1.power = flashLightPower + 3.65;
     spotLight1.angle = 0.55;
     spotLight1.decay = 2;
     spotLight1.penumbra = 0.1;
@@ -1681,7 +1747,7 @@ function init() {
     spotLight1.rotateX(Math.PI/2);
 
     spotLight2 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-    spotLight2.power = 1.65;
+    spotLight2.power = flashLightPower + 1.65;
     spotLight2.angle = 0.65;
     spotLight2.decay = 2;
     spotLight2.penumbra = 0.1;
@@ -1690,7 +1756,7 @@ function init() {
     spotLight2.rotateX(Math.PI/2);
 
     spotLight3 = new THREE.SpotLight(0xffffff, 0.5, 150);
-    spotLight3.power = 5;
+    spotLight3.power = + flashLightPower + 5;
     spotLight3.angle = 0.40;
     spotLight3.decay = 6;
     spotLight3.penumbra = 1;
@@ -1699,7 +1765,7 @@ function init() {
     spotLight3.rotateX(Math.PI/2);
 
     spotLight4 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-    spotLight4.power = 2.65;
+    spotLight4.power = flashLightPower + 2.65;
     spotLight4.angle = 0.1;
     spotLight4.decay = 6;
     spotLight4.penumbra = 0.1;
@@ -1771,16 +1837,18 @@ function animate() {
 
     if ( controls.isLocked === true ) {
 
-        rainGeo.vertices.forEach(p => {
-            p.velocity -= 0.1 + Math.random() * 0.1;
-            p.y += p.velocity;
-            if (p.y < -50) {
-                p.y = 200;
-                p.velocity = 0;
-            }
-        });
-        rainGeo.verticesNeedUpdate = true;
-        rain.rotation.y +=0.002;
+        if (rainOn === true) {
+            rainGeo.vertices.forEach(p => {
+                p.velocity -= 0.1 + Math.random() * 0.1;
+                p.y += p.velocity;
+                if (p.y < -50) {
+                    p.y = 200;
+                    p.velocity = 0;
+                }
+            });
+            rainGeo.verticesNeedUpdate = true;
+            rain.rotation.y +=0.002;
+        }
 
         raycaster.ray.origin.copy( controls.getObject().position ); // localização
         raycaster.ray.origin.y += 18; // localização
@@ -1851,7 +1919,7 @@ function animate() {
                 AudioLoader.load( 'sounds/flashLightClickSound.wav', function( buffer ) {
                     flashLightClickSound.setBuffer( buffer );
                     flashLightClickSound.setLoop( false);
-                    flashLightClickSound.setVolume( 0.5 );
+                    flashLightClickSound.setVolume( flashLightClickSoundVolume );
                     flashLightClickSound.play();
                     });							
                 camera.add(flashLight);
@@ -1877,7 +1945,7 @@ function animate() {
                     AudioLoader.load( 'sounds/page_flip.mp3', function( buffer ) {
                         pageFlipSound.setBuffer( buffer );
                         pageFlipSound.setLoop( false );
-                        pageFlipSound.setVolume( 0.4 );
+                        pageFlipSound.setVolume( pageFlipSoundVolume );
                         pageFlipSound.play();
                     });
                 collectPages += 1;
@@ -1886,30 +1954,32 @@ function animate() {
             }
         }
         
-        if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - slenders[0].position.x, 2) + Math.pow(raycaster.ray.origin.z - slenders[0].position.z, 2)) < 110) { 
-            spotLight1.power = Math.floor(Math.random() * 6);
-            spotLight2.power = Math.floor(Math.random() * 5);
-            spotLight3.power = Math.floor(Math.random() * 10);
-            spotLight4.power = Math.floor(Math.random() * 9);					
-            if (Math.sqrt(Math.pow(raycaster.ray.origin.x - slenders[0].position.x, 2) + Math.pow(raycaster.ray.origin.z - slenders[0].position.z, 2)) <  45) { //50
-                controls.disconnect();
-                camera.lookAt(slenders[0].up);
-                glitchPass.goWild = true;
-                if(slenderStaticSound.isPlaying === false)
-                    AudioLoader.load( 'sounds/slender_static.mp3', function( buffer ) {
-                    slenderStaticSound.setBuffer( buffer );
-                    slenderStaticSound.setLoop( false );
-                    slenderStaticSound.setVolume( 0.5 );
-                    slenderStaticSound.play();
-                    document.removeEventListener('keydown', onKeyDown);
-                    setTimeout(() => {  open(location, '_self').close(); }, 7500);
-                });
+        if(lanternPicked & slenderOn) {
+            if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - slenders[0].position.x, 2) + Math.pow(raycaster.ray.origin.z - slenders[0].position.z, 2)) < 110) { 
+                spotLight1.power = Math.floor(Math.random() * 6);
+                spotLight2.power = Math.floor(Math.random() * 5);
+                spotLight3.power = Math.floor(Math.random() * 10);
+                spotLight4.power = Math.floor(Math.random() * 9);					
+                if (Math.sqrt(Math.pow(raycaster.ray.origin.x - slenders[0].position.x, 2) + Math.pow(raycaster.ray.origin.z - slenders[0].position.z, 2)) <  45) { //50
+                    controls.disconnect();
+                    camera.lookAt(slenders[0].up);
+                    glitchPass.goWild = true;
+                    if(slenderStaticSound.isPlaying === false)
+                        AudioLoader.load( 'sounds/slender_static.mp3', function( buffer ) {
+                        slenderStaticSound.setBuffer( buffer );
+                        slenderStaticSound.setLoop( false );
+                        slenderStaticSound.setVolume( slenderStaticSoundVolume );
+                        slenderStaticSound.play();
+                        document.removeEventListener('keydown', onKeyDown);
+                        setTimeout(() => {  open(location, '_self').close(); }, 7500);
+                    });
+                }
+            } else {
+                spotLight1.power = flashLightPower + 3.65;
+                spotLight2.power = flashLightPower + 1.65;
+                spotLight3.power = flashLightPower + 5;
+                spotLight4.power = flashLightPower + 2.65;						
             }
-        } else {
-            spotLight1.power = 3.65;
-            spotLight2.power = 1.65;
-            spotLight3.power = 5;
-            spotLight4.power = 2.65;						
         }
 
         if(moveBackward || moveForward || moveLeft || moveRight) {
@@ -1917,7 +1987,7 @@ function animate() {
             AudioLoader.load( 'sounds/step' + Math.floor(Math.random() * 2) + '.mp3', function( buffer ) {
                 stepSound.setBuffer( buffer );
                 stepSound.setLoop( false);
-                stepSound.setVolume( 0.6 );
+                stepSound.setVolume( stepSoundVolume );
                 stepSound.play();
                 });
             }
@@ -1930,7 +2000,7 @@ function animate() {
         };
 
         // slenderMan movimentation
-        if(lanternPicked) {
+        if(lanternPicked & slenderOn) {
             slenders[0].rotation.y = Math.atan2(( camera.position.z - slenders[0].position.z ) , ( camera.position.x - slenders[0].position.x ));
             slenders[0].position.lerp(camera.position, slenderSpeed)
         }
@@ -1938,6 +2008,12 @@ function animate() {
 
         origem = raycaster.ray.origin.clone();
         origem.y -= 18;
+
+        if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - origem.x, 2) + Math.pow(raycaster.ray.origin.z - origem.z, 2)) > 20) {
+            controls.getObject().position.x = origem.x;
+            controls.getObject().position.y = origem.y;
+            controls.getObject().position.z = origem.z;
+        }
     }
     //
     prevTime = time;

@@ -667,3 +667,191 @@
         transform: rotate(360deg);
     }
 }
+
+.dropdown {
+  left: 10px;
+  top: 10px;
+  width: 5%;
+  position: absolute;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--color-primary);
+  min-width: 160px;
+  box-shadow: var(--shadow) 3px 3px;
+  z-index: 1;
+  text-align:center;
+}
+
+.dropdown-content a {
+  border: var(--border-size) solid black;
+  color: var(--color-secondary);
+  background-color: var(--color-primary);
+  color: black;
+  padding: 12px 16px;
+  display: block;
+  font-size: 1.25rem;
+  font-family: var(--font-family);
+  text-transform: lowercase;
+  text-shadow: var(--shadow) 2px 2px;
+}
+
+.dropdown-content a:hover {
+  background-color: var(--color-primary);
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: var(--color-primary);
+}
+
+input[type=range] {
+  width: 100%;
+  margin: 4.25px 0;
+  background-color: var(--color-primary);
+  -webkit-appearance: none;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  background: rgba(168, 168, 168, 0.1);
+  border: 0.2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 1.3px;
+  width: 100%;
+  height: 11.5px;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  margin-top: -4.45px;
+  width: 20px;
+  height: 20px;
+  background: rgba(168, 168, 168, 0.411);
+  border: 10px solid rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #b5b5b5;
+}
+input[type=range]::-moz-range-track {
+  background: rgba(168, 168, 168, 0.1);
+  border: 0.2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 1.3px;
+  width: 100%;
+  height: 11.5px;
+  cursor: pointer;
+}
+input[type=range]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: rgba(168, 168, 168, 0.411);
+  border: 10px solid rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  background: var(--color-primary);
+  border-color: transparent;
+  border-width: 4.25px 0;
+  color: transparent;
+  width: 100%;
+  height: 11.5px;
+  cursor: pointer;
+}
+input[type=range]::-ms-fill-lower {
+  background: #9b9b9b;
+  border: 0.2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 2.6px;
+}
+input[type=range]::-ms-fill-upper {
+  background: rgba(168, 168, 168, 0.1);
+  border: 0.2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 2.6px;
+}
+input[type=range]::-ms-thumb {
+  width: 20px;
+  height: 20px;
+  background: rgba(168, 168, 168, 0.411);
+  border: 10px solid rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 0px;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: rgba(168, 168, 168, 0.1);
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #b5b5b5;
+}
+
+:root {
+  --duration: 250ms;
+  --ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --font-family: monospace;
+  --color-primary: rgba(255, 255, 255, 0.5);
+  --color-secondary: black;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --space: 1rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.multi-button {
+  position: relative;
+  display: flex;
+  width: 100%;
+  box-shadow: var(--shadow) 3px 3px;
+}
+
+.multi-button button {
+  width: 100%;
+  flex-grow: 1;
+  cursor: pointer;
+  padding:
+    calc(var(--space) / 1.125)
+    var(--space)
+    var(--space);
+  border: var(--border-size) solid black;
+  color: var(--color-secondary);
+  background-color: var(--color-primary);
+  font-size: 1.2rem;
+  font-family: var(--font-family);
+  text-transform: lowercase;
+  text-shadow: var(--shadow) 2px 2px;
+  transition: flex-grow var(--duration) var(--ease);
+}
+
+.multi-button button + button {
+  border-left: var(--border-size) solid black;
+  margin-left: calc(var(--border-size) * -1);
+}
+
+.multi-button button:hover,
+.multi-button button:focus {
+  flex-grow: 2;
+  color: white;
+  outline: none;
+  text-shadow: none;
+  background-color: var(--color-secondary);
+}
+
+.multi-button button:focus {
+  outline: var(--border-size) dashed var(--color-primary);
+  outline-offset: calc(var(--border-size) * -3);
+}
+
+.multi-button:hover button:focus:not(:hover) {
+  flex-grow: 1;
+  color: var(--color-secondary);
+  background-color: var(--color-primary);
+}

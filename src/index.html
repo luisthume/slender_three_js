@@ -12,27 +12,46 @@
 		</style>
 	</head>
 	<body>
-		<section id="loading-screen">
-			<div id="loader"></div>
-		</section>
-		<div id="gameover">
-			<br /><br />
-			<span style="font-size:60px;color:#8d1212">Thank you for the pages</span>
-		</div>
-		<div id="blocker">
-			<div id="instructions">
-				<span style="font-size:52px;color:#8d1212">Collect the pages to escape</span>
-				<br /><br />				
-				<span style="font-size:40px">Click to play</span>
+		<div class="container">
+			<section id="loading-screen">
+				<div id="loader"></div>
+			</section>
+			<div id="gameover">
 				<br /><br />
-				<span style="font-size:30px">Move: WASD<br/>
-				Look: MOUSE<br/>
-				E: COLLECT PAGE<br/>
-				Shift: RUN</span>
+				<span style="font-size:60px;color:#8d1212">Thank you for the pages</span>
 			</div>
-		</div>
-		<div id="pages">
-			<span></span>
+			<div id="blocker">
+				<div class="dropdown">
+					<div class="multi-button">
+						<button class="dropbtn">Menu</button>
+						<div class="dropdown-content">
+							<a>Flashlight</a>
+							<input type="range" min="1" max="100" value="50" class="slider" id="flashLightPowerRange">
+							<a>Sound volume</a>
+							<input type="range" min="-100" max="100" value="0" class="slider" id="volume">						
+							<button onclick="turnLightsOn()">Lights on</button>
+							<button onclick="turnLightsOff()">Lights off</button>
+							<button onclick="turnSlenderOff()"> Slender Off</button>
+							<button onclick="turnSlenderOn()"> Slender On</button>
+							<button onclick="turnRainOff()">Turn rain off</button>
+							<button onclick="turnRainOn()">Turn rain on</button>
+						</div>
+					</div>
+				  </div>		
+				<div id="instructions">			
+					<span style="font-size:52px;color:#8d1212">Collect the pages to escape</span>
+					<br /><br />				
+					<span style="font-size:40px">Click to play</span>
+					<br /><br />
+					<span style="font-size:30px">Move: WASD<br/>
+					Look: MOUSE<br/>
+					E: COLLECT PAGE<br/>
+					Shift: RUN</span>
+				</div>
+			</div>
+			<div id="pages">
+				<span></span>
+			</div>
 		</div>
 
 		<script src="js/three.js"></script>
