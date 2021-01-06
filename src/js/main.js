@@ -14,7 +14,11 @@ let rainOn = true;
 let rainSoundOn = true;
 let slenderOn = true;
 let gateCollision;
-let onWater, flashLightBody, flashLightLamp, flashLightCircle, spotLight1, spotLight2, spotLight3, spotLight4, light;
+let onWater, flashLightBody, flashLightLamp, flashLightCircle, outlineMesh1, outlineMesh2, spotLight1, spotLight2, spotLight3, spotLight4, ambientLight;
+var flashLightPower1 = 3.65;
+var flashLightPower2 = 1.65;
+var flashLightPower3 = 5;
+var flashLightPower4 = 2.65;			
 
 const objects = [];
 const papers = [];
@@ -23,7 +27,7 @@ const water = [];
 
 let forestSound, stepSound, slenderStaticSound, pageFlipSound, rainSound, flashLightClickSound, gateClosingSound;
 var slenderSpeed = 0.0;
-var baseSlenderSpeed = 0.00175; //velocidade inicial
+var baseSlenderSpeed = 0.00175;
 var collectPages = 0;
 var inicialPapersLenght = 0;
 var flashLightPower = 0;
@@ -97,11 +101,19 @@ function loadSlender() {
 }
 
 function turnLightsOn() {
-    light.intensity = 0.75;
+    flashLightPower = 0;
+    flashLightPower = 0;
+    flashLightPower = 0;
+    flashLightPower = 0;
+    scene.add(ambientLight);
 }
 
-function turnLightsOff() {
-    light.intensity = 0.0;
+function turnLightsOff() {		
+    spotLight1.power = flashLightPower + flashLightPower1;
+    spotLight2.power = flashLightPower + flashLightPower2;
+    spotLight3.power = flashLightPower + flashLightPower3;
+    spotLight4.power = flashLightPower + flashLightPower4;
+    scene.remove(ambientLight);
 }
 
 function turnRainOff() {
@@ -154,9 +166,8 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000000 );
 
-    light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.00 );  // ( 0xeeeeff, 0x777788, 0.5 )
-    light.position.set( 0.5, 1, 0.75 );
-    scene.add(light);
+    ambientLight = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.5 ); 
+    ambientLight.position.set( 0.5, 1, 0.75 );
 
     controls = new THREE.PointerLockControls( camera, document.body );
     controls.speedFactor = mouseSpeed;
@@ -174,7 +185,9 @@ function init() {
     controls.addEventListener( 'lock', function () {
         instructions.style.display = 'none';
         blocker.style.display = 'none';
-        pages.style.visibility = 'visible';
+        pages.style.display = 'block';
+        document.addEventListener( 'keydown', onKeyDown, false );
+        document.addEventListener( 'keyup', onKeyUp, false );
         // create an AudioListener and add it to the camera
         camera.add( listener );
         if(gateClosed === false) {
@@ -215,15 +228,22 @@ function init() {
     } );
 
     controls.addEventListener( 'unlock', function () {
+        moveForward = moveBackward = moveRight = moveLeft = false;
+        document.removeEventListener( 'keydown', onKeyDown );
+        document.removeEventListener( 'keyup', onKeyUp );
         blocker.style.display = 'block';
         instructions.style.display = '';
-        forestSound.stop();
-        if(rainSoundOn === true) rainSound.stop();
+        try { forestSound.stop(); }
+        catch(err) { console.log('Não foi possível carregar sound a tempo'); }
+        if(rainSoundOn === true) {
+            try { rainSound.stop(); }
+            catch(err) { console.log('Não foi possível carregar sound a tempo'); }
+        }
     } );
 
     flashLightPowerRange = document.getElementById('flashLightPowerRange')
-    flashLightPowerRange.addEventListener('change', function() {
-        flashLightPower = flashLightPowerRange.value/20-1;
+    flashLightPowerRange.addEventListener('change', function() {        
+        flashLightPower = flashLightPowerRange.value/40;
     })
 
     const volume = document.getElementById('volume')
@@ -278,7 +298,6 @@ function init() {
     const onKeyUp = function ( event ) {
 
         switch ( event.keyCode ) {
-
             case 38: // up
             case 87: // w
                 moveForward = false;
@@ -306,13 +325,8 @@ function init() {
             case 69: // e
                 interact = false;
                 break;
-
         }
-
     };
-
-    document.addEventListener( 'keydown', onKeyDown, false );
-    document.addEventListener( 'keyup', onKeyUp, false );
     
     raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );	
 
@@ -376,7 +390,7 @@ function init() {
 
                 var planeGeometry = new THREE.PlaneBufferGeometry( containerLenght, containerHeight)
                 const container_texture = new THREE.TextureLoader(loadingManager).load( 'textures/container.png' );			
-                const planeMaterial = new THREE.MeshStandardMaterial( {map: container_texture, side: THREE.DoubleSide} );
+                const planeMaterial = new THREE.MeshPhongMaterial( {map: container_texture, side: THREE.DoubleSide} );
                 var plane = new THREE.Mesh( planeGeometry,  planeMaterial);
 
                 plane.position.x = i*20;
@@ -435,12 +449,12 @@ function init() {
                 wall_texture2.repeat.set( 0.1, 1 );
                 const boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
 
                 const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -584,12 +598,12 @@ function init() {
                 
                 var boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -624,12 +638,12 @@ function init() {
                 wall_texture.repeat.set( 1, 1 );								
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box3 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -652,12 +666,12 @@ function init() {
                 wall_texture.repeat.set( 1, 1 );								
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box4 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -680,12 +694,12 @@ function init() {
                 wall_texture.repeat.set( 1, 1 );			
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({color: 0xcce0eb, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box5 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -709,12 +723,12 @@ function init() {
                 wall_texture.repeat.set( 1, 1 );			
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box6 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -738,12 +752,12 @@ function init() {
                 wall_texture.repeat.set( 4, 1 );								
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box7 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -767,12 +781,12 @@ function init() {
                 wall_texture.repeat.set( 4, 1 );								
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box8 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -796,12 +810,12 @@ function init() {
                 wall_texture.repeat.set( 5, 1 );									
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box9 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -824,12 +838,12 @@ function init() {
                 wall_texture.repeat.set( 5, 1 );									
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box10 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -852,12 +866,12 @@ function init() {
                 wall_texture.repeat.set( 4, 1 );								
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture , side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture , side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box11 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -881,12 +895,12 @@ function init() {
                 wall_texture.repeat.set( 4, 1 );								
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture , side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture , side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box12 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -907,12 +921,12 @@ function init() {
                 wall_texture = new THREE.TextureLoader(loadingManager).load( 'textures/bathroom_wall.png' );			
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
 
                 wall_texture.wrapS = THREE.RepeatWrapping;
@@ -940,12 +954,12 @@ function init() {
                 wall_texture.repeat.set( 4, 1 );
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
 
                 const box14 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -969,12 +983,12 @@ function init() {
                 wall_texture.repeat.set( 2, 1 );
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
 
                 const box15 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -994,12 +1008,12 @@ function init() {
                 boxGeometry = new THREE.BoxBufferGeometry( 60, 35, 3)
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box16 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -1019,12 +1033,12 @@ function init() {
                 boxGeometry = new THREE.BoxBufferGeometry( 124, 200, 3)
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box17 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -1040,12 +1054,12 @@ function init() {
                 boxGeometry = new THREE.BoxBufferGeometry( 22, 43, 3)
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box18 = new THREE.Mesh( boxGeometry, boxMaterial);
 
@@ -1061,12 +1075,12 @@ function init() {
                 boxGeometry = new THREE.BoxBufferGeometry( 31, 60, 3)
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box19 = new THREE.Mesh( boxGeometry, boxMaterial);
 
@@ -1082,12 +1096,12 @@ function init() {
                 boxGeometry = new THREE.BoxBufferGeometry( 124, 200, 3)
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box20 = new THREE.Mesh( boxGeometry,  boxMaterial);
 
@@ -1103,12 +1117,12 @@ function init() {
                 boxGeometry = new THREE.BoxBufferGeometry( 22, 43, 3)
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box21 = new THREE.Mesh( boxGeometry, boxMaterial);
 
@@ -1124,12 +1138,12 @@ function init() {
                 boxGeometry = new THREE.BoxBufferGeometry( 31, 60, 3)
                 boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture3, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2 , side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture2, side: THREE.DoubleSide}) // BACK SIDE
                     ];
                 const box22 = new THREE.Mesh( boxGeometry, boxMaterial);
 
@@ -1158,7 +1172,7 @@ function init() {
                         object.traverse( function ( child ) {
 
                         if ( child instanceof THREE.Mesh ) {
-                            child.material = new THREE.MeshStandardMaterial( {color: 0x090909, side: THREE.DoubleSide} ) //0x090909
+                            child.material = new THREE.MeshPhongMaterial( {color: 0x090909, side: THREE.DoubleSide} ) //0x090909
                             }
                         } );
 
@@ -1168,7 +1182,7 @@ function init() {
 
                         scene.add( object );
                         const geometry = new THREE.CircleBufferGeometry( scale + 24, 12 );
-                        const circle = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+                        const circle = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 
                         circle.position.x = i*20;
                         circle.position.y = 4;
@@ -1260,7 +1274,7 @@ function init() {
 
             const cylinderGeometry = new THREE.CylinderBufferGeometry( tunnelRad, tunnelRad, tunnelLenght, 24, 1, true )
             const tunnelTexture = new THREE.TextureLoader(loadingManager).load( 'textures/wall.jpg' );
-            const cylinderMaterial = new THREE.MeshStandardMaterial( {  map : tunnelTexture, side: THREE.DoubleSide});							
+            const cylinderMaterial = new THREE.MeshPhongMaterial( {  map : tunnelTexture, side: THREE.DoubleSide});							
             const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
 
             cylinder.position.x = i*20;
@@ -1275,7 +1289,7 @@ function init() {
             cylinder2.position.z = j*20;
 
             const torusGeometry = new THREE.TorusBufferGeometry( secondRad-2, 3, 16, 16 );
-            const torusMaterial = new THREE.MeshStandardMaterial( { map: tunnelTexture } );
+            const torusMaterial = new THREE.MeshPhongMaterial( { map: tunnelTexture } );
             const torus = new THREE.Mesh( torusGeometry, torusMaterial );
 
             torus.position.x = i*20;
@@ -1285,7 +1299,7 @@ function init() {
 
             const geometry = new THREE.CircleBufferGeometry( tunnelRad, 16 );
             const blackWaterTexture = new THREE.TextureLoader(loadingManager).load( 'textures/black_water.jpg' );						
-            const material = new THREE.MeshStandardMaterial( { map: blackWaterTexture } );
+            const material = new THREE.MeshPhongMaterial( { map: blackWaterTexture } );
             const circle = new THREE.Mesh( geometry, material );
 
             circle.position.x = i*20;
@@ -1305,12 +1319,12 @@ function init() {
             plankTexture3.repeat.set( 1, 0.1 );												
             boxMaterial = 
                 [
-                    new THREE.MeshStandardMaterial({map: plankTexture2, side: THREE.DoubleSide}), // RIGHT SIDE
-                    new THREE.MeshStandardMaterial({map: plankTexture3, side: THREE.DoubleSide}), // LEFT SIDE
-                    new THREE.MeshStandardMaterial({map: plankTexture3, side: THREE.DoubleSide}), // TOP SIDE
-                    new THREE.MeshStandardMaterial({map: plankTexture2, side: THREE.DoubleSide}), // BOTTOM SIDE
-                    new THREE.MeshStandardMaterial({map: plankTexture1, side: THREE.DoubleSide}), // FRONT SIDE
-                    new THREE.MeshStandardMaterial({map: plankTexture1, side: THREE.DoubleSide}) // BACK SIDE
+                    new THREE.MeshPhongMaterial({map: plankTexture2, side: THREE.DoubleSide}), // RIGHT SIDE
+                    new THREE.MeshPhongMaterial({map: plankTexture3, side: THREE.DoubleSide}), // LEFT SIDE
+                    new THREE.MeshPhongMaterial({map: plankTexture3, side: THREE.DoubleSide}), // TOP SIDE
+                    new THREE.MeshPhongMaterial({map: plankTexture2, side: THREE.DoubleSide}), // BOTTOM SIDE
+                    new THREE.MeshPhongMaterial({map: plankTexture1, side: THREE.DoubleSide}), // FRONT SIDE
+                    new THREE.MeshPhongMaterial({map: plankTexture1, side: THREE.DoubleSide}) // BACK SIDE
                 ];
             var plank = new THREE.Mesh( boxGeometry, boxMaterial);
 
@@ -1356,12 +1370,12 @@ function init() {
                 const yellow_texture = new THREE.TextureLoader(loadingManager).load( 'textures/magic_cube/yellow_cube.jpeg' );
                 const boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: red_texture}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: orange_texture}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: blue_texture}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: white_texture}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: green_texture}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: yellow_texture}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: red_texture}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: orange_texture}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: blue_texture}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: white_texture}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: green_texture}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: yellow_texture}) // BACK SIDE
                     ];
 
                 const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -1382,12 +1396,12 @@ function init() {
                 const clownBoxTexture = new THREE.TextureLoader(loadingManager).load( 'textures/clown_box.jpg' );
                 const boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: clownBoxTexture}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: clownBoxTexture}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: clownBoxTexture}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: clownBoxTexture}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: clownBoxTexture}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: clownBoxTexture}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: clownBoxTexture}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: clownBoxTexture}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: clownBoxTexture}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: clownBoxTexture}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: clownBoxTexture}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: clownBoxTexture}) // BACK SIDE
                     ];
 
                 const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -1397,7 +1411,7 @@ function init() {
                 box1.position.z = j*20+z;
 
                 var cylinderGeometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 1.75, 12)
-                var cylinderMaterial = new THREE.MeshStandardMaterial( {  color : 0x43464B, side: THREE.DoubleSide});							
+                var cylinderMaterial = new THREE.MeshPhongMaterial( {  color : 0x43464B, side: THREE.DoubleSide});							
                 var cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
 
                 cylinder.position.x = i*20+1.75+x;
@@ -1409,7 +1423,7 @@ function init() {
                 //
 
                 cylinderGeometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 1, 12)
-                cylinderMaterial = new THREE.MeshStandardMaterial( {  color : 0x43464B, side: THREE.DoubleSide});							
+                cylinderMaterial = new THREE.MeshPhongMaterial( {  color : 0x43464B, side: THREE.DoubleSide});							
                 const cylinder2 = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
 
                 cylinder2.position.x = i*20+2.55+x;
@@ -1421,7 +1435,7 @@ function init() {
 
                 const woodTexture = new THREE.TextureLoader(loadingManager).load( 'textures/plank.jpg' );
                 cylinderGeometry = new THREE.CylinderBufferGeometry( 0.2, 0.2, 1, 12)
-                cylinderMaterial = new THREE.MeshStandardMaterial( {  map : woodTexture, side: THREE.DoubleSide});							
+                cylinderMaterial = new THREE.MeshPhongMaterial( {  map : woodTexture, side: THREE.DoubleSide});							
                 const cylinder3 = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
 
                 cylinder3.position.x = i*20+3+x;
@@ -1460,7 +1474,7 @@ function init() {
 
                         if ( child instanceof THREE.Mesh ) {
                             const mattressTexture = new THREE.TextureLoader(loadingManager).load( 'models/mattress/mattressTexture.jpg' );			
-                            child.material = new THREE.MeshStandardMaterial( {map: mattressTexture, side: THREE.DoubleSide} )
+                            child.material = new THREE.MeshPhongMaterial( {map: mattressTexture, side: THREE.DoubleSide} )
                             }
                         } );
                         scene.add( mattress );
@@ -1491,7 +1505,7 @@ function init() {
 
                         if ( child instanceof THREE.Mesh ) {
                             const garbageCanTexture = new THREE.TextureLoader(loadingManager).load( 'models/garbage_can/garbage_can.png' );			
-                            child.material = new THREE.MeshStandardMaterial( {map: garbageCanTexture, side: THREE.DoubleSide} )
+                            child.material = new THREE.MeshPhongMaterial( {map: garbageCanTexture, side: THREE.DoubleSide} )
                             }
                         } );
                         scene.add( garbageCan );
@@ -1520,7 +1534,7 @@ function init() {
 
                         if ( child instanceof THREE.Mesh ) {
                             const sinkTexture = new THREE.TextureLoader(loadingManager).load( 'models/sink/sinkTexture.png' );			
-                            child.material = new THREE.MeshStandardMaterial( {map: sinkTexture, side: THREE.DoubleSide} )
+                            child.material = new THREE.MeshPhongMaterial( {map: sinkTexture, side: THREE.DoubleSide} )
                             }
                         } );
                         scene.add( sink );
@@ -1577,7 +1591,7 @@ function init() {
 
                         object.traverse( function ( child ) {
                         if ( child instanceof THREE.Mesh ) {
-                            child.material = new THREE.MeshStandardMaterial( {map: new THREE.TextureLoader(loadingManager).load( 'models/bench/BenchOBJ.png' ), side: THREE.DoubleSide} )
+                            child.material = new THREE.MeshPhongMaterial( {map: new THREE.TextureLoader(loadingManager).load( 'models/bench/BenchOBJ.png' ), side: THREE.DoubleSide} )
                             }
                         } );
 
@@ -1609,7 +1623,7 @@ function init() {
                 flashLightLamp.rotateZ(Math.PI-Math.PI*3/10)	
 
                 spotLight1 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-                spotLight1.power = flashLightPower + 3.65;
+                spotLight1.power = flashLightPower + flashLightPower1;
                 spotLight1.angle = 0.55;
                 spotLight1.decay = 2;
                 spotLight1.penumbra = 0.1;
@@ -1617,7 +1631,7 @@ function init() {
                 spotLight1.castShadow = true;
 
                 spotLight2 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-                spotLight2.power = flashLightPower + 1.65;
+                spotLight2.power = flashLightPower + flashLightPower2;
                 spotLight2.angle = 0.65;
                 spotLight2.decay = 2;
                 spotLight2.penumbra = 0.1;
@@ -1630,12 +1644,32 @@ function init() {
                 flashLightCircle.position.x = i*20-4.235;
                 flashLightCircle.position.y = 2.2;
                 flashLightCircle.position.z = j*20-3.225;
-                flashLightCircle.rotateY(Math.PI*3/10)								
+                flashLightCircle.rotateY(Math.PI*3/10)			
+
+                let outlineMaterial2 = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.BackSide } );
+                outlineMesh2 = new THREE.Mesh( new THREE.CylinderGeometry(2, 1, 2, 12), outlineMaterial2 );
+                outlineMesh2.position.x = i*20-3.435;
+                outlineMesh2.position.y = 2.2;
+                outlineMesh2.position.z = j*20-2.525;
+                outlineMesh2.rotateX(Math.PI/2)
+                outlineMesh2.rotateZ(Math.PI-Math.PI*3/10)
+                outlineMesh2.scale.multiplyScalar(1.06);   
+                
+                let outlineMaterial1 = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.BackSide } );
+                outlineMesh1 = new THREE.Mesh( new THREE.CylinderGeometry(1, 1, 6.5, 12), outlineMaterial1 );
+                outlineMesh1.position.x = i*20;
+                outlineMesh1.position.y = 2.2;
+                outlineMesh1.position.z = j*20;
+                outlineMesh1.rotateX(Math.PI/2);
+                outlineMesh1.rotateZ(Math.PI-Math.PI*3/10)
+                outlineMesh1.scale.multiplyScalar(1.06);         
 
                 flashLightLamp.add(spotLight1);
                 flashLightLamp.add(spotLight2);
                 scene.add(flashLightBody);
                 scene.add(flashLightLamp);
+                scene.add( outlineMesh1 );           
+                scene.add( outlineMesh2 );       
                 scene.add(flashLightCircle);
             }
 
@@ -1668,12 +1702,12 @@ function init() {
                 wall_texture.repeat.set( 2, 1 );
                 const boxMaterial = 
                     [
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // TOP SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
-                        new THREE.MeshStandardMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // RIGHT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // LEFT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // TOP SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // BOTTOM SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}), // FRONT SIDE
+                        new THREE.MeshPhongMaterial({map: wall_texture, side: THREE.DoubleSide}) // BACK SIDE
                     ];
 
                 const box1 = new THREE.Mesh( boxGeometry,  boxMaterial);
@@ -1738,7 +1772,7 @@ function init() {
     flashLight.position.set(2,-3,0);
 
     spotLight1 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-    spotLight1.power = flashLightPower + 3.65;
+    spotLight1.power = flashLightPower + flashLightPower1;
     spotLight1.angle = 0.55;
     spotLight1.decay = 2;
     spotLight1.penumbra = 0.1;
@@ -1747,7 +1781,7 @@ function init() {
     spotLight1.rotateX(Math.PI/2);
 
     spotLight2 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-    spotLight2.power = flashLightPower + 1.65;
+    spotLight2.power = flashLightPower + flashLightPower2;
     spotLight2.angle = 0.65;
     spotLight2.decay = 2;
     spotLight2.penumbra = 0.1;
@@ -1756,7 +1790,7 @@ function init() {
     spotLight2.rotateX(Math.PI/2);
 
     spotLight3 = new THREE.SpotLight(0xffffff, 0.5, 150);
-    spotLight3.power = + flashLightPower + 5;
+    spotLight3.power = + flashLightPower + flashLightPower3;
     spotLight3.angle = 0.40;
     spotLight3.decay = 6;
     spotLight3.penumbra = 1;
@@ -1765,7 +1799,7 @@ function init() {
     spotLight3.rotateX(Math.PI/2);
 
     spotLight4 = new THREE.SpotLight(0xcccccc, 0.5, 150);
-    spotLight4.power = flashLightPower + 2.65;
+    spotLight4.power = flashLightPower + flashLightPower4;
     spotLight4.angle = 0.1;
     spotLight4.decay = 6;
     spotLight4.penumbra = 0.1;
@@ -1782,7 +1816,10 @@ function init() {
     flashLight.add(spotLight4);
     flashLight.add(spotLight4.target);
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({
+      antialias: false,
+    })
+
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
@@ -1836,12 +1873,11 @@ function animate() {
     const time = performance.now();
 
     if ( controls.isLocked === true ) {
-
         if (rainOn === true) {
             rainGeo.vertices.forEach(p => {
                 p.velocity -= 0.1 + Math.random() * 0.1;
                 p.y += p.velocity;
-                if (p.y < -50) {
+                if (p.y < -10) {
                     p.y = 200;
                     p.velocity = 0;
                 }
@@ -1860,7 +1896,7 @@ function animate() {
 
         // Set the velocity.x and velocity.z using the calculated time delta
         for(var i = 0; i < water.length; i++) {	
-            if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - water[i].position.x, 2) + Math.pow(raycaster.ray.origin.z - water[i].position.z, 2)) <= 26) {							
+            if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - water[i].position.x, 2) + Math.pow(raycaster.ray.origin.z - water[i].position.z, 2)) <= 22) {							
                 onWater = true;
                 break;
             } else {
@@ -1923,6 +1959,8 @@ function animate() {
                     flashLightClickSound.play();
                     });							
                 camera.add(flashLight);
+                scene.remove(outlineMesh1);
+                scene.remove(outlineMesh2);
                 scene.remove(flashLightBody);
                 scene.remove(flashLightLamp);
                 scene.remove(flashLightCircle);
@@ -1975,10 +2013,10 @@ function animate() {
                     });
                 }
             } else {
-                spotLight1.power = flashLightPower + 3.65;
-                spotLight2.power = flashLightPower + 1.65;
-                spotLight3.power = flashLightPower + 5;
-                spotLight4.power = flashLightPower + 2.65;						
+                spotLight1.power = flashLightPower + flashLightPower1;
+                spotLight2.power = flashLightPower + flashLightPower2;
+                spotLight3.power = flashLightPower + flashLightPower3;
+                spotLight4.power = flashLightPower + flashLightPower4;						
             }
         }
 
@@ -1992,10 +2030,19 @@ function animate() {
                 });
             }
         }
+        
+        if(papers.length === 1) {
+            if(raycaster.ray.origin.x > 920.0) {
+                turnSlenderOff();
+                glitchPass.goWild = true;
+                console.log('RUN!')
+                console.log('DO NOT STOP!')
+                setTimeout(() => {  open(location, '_self').close(); }, 7500);
+            }
+        }
 
         if(papers.length <= 0) {
-            gateCollision
-            gameover.style.visibility = 'visible';						
+            gameover.style.display = 'block';						
             slenderSpeed = 0.02;
         };
 
@@ -2009,11 +2056,12 @@ function animate() {
         origem = raycaster.ray.origin.clone();
         origem.y -= 18;
 
-        if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - origem.x, 2) + Math.pow(raycaster.ray.origin.z - origem.z, 2)) > 20) {
+        if ( Math.sqrt(Math.pow(raycaster.ray.origin.x - origem.x, 2) + Math.pow(raycaster.ray.origin.z - origem.z, 2)) > 10) {
             controls.getObject().position.x = origem.x;
             controls.getObject().position.y = origem.y;
             controls.getObject().position.z = origem.z;
-        }
+            console.log('Teleport detected')
+        }       
     }
     //
     prevTime = time;

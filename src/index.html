@@ -23,18 +23,23 @@
 			<div id="blocker">
 				<div class="dropdown">
 					<div class="multi-button">
-						<button class="dropbtn">Menu</button>
+						<button class="dropbtn">Configs</button>
 						<div class="dropdown-content">
 							<a>Flashlight</a>
-							<input type="range" min="1" max="100" value="50" class="slider" id="flashLightPowerRange">
+							<input type="range" min="-100" max="100" value="0" class="slider" id="flashLightPowerRange">
 							<a>Sound volume</a>
-							<input type="range" min="-100" max="100" value="0" class="slider" id="volume">						
-							<button onclick="turnLightsOn()">Lights on</button>
-							<button onclick="turnLightsOff()">Lights off</button>
-							<button onclick="turnSlenderOff()"> Slender Off</button>
-							<button onclick="turnSlenderOn()"> Slender On</button>
-							<button onclick="turnRainOff()">Turn rain off</button>
-							<button onclick="turnRainOn()">Turn rain on</button>
+							<input type="range" min="-100" max="100" value="0" class="slider" id="volume">	
+							<div class=dev-dropdown>
+								<button class="dev-dropbtn">Dev Tools</button>
+								<div class="dev-dropdown-content">
+									<button onclick="turnLightsOn()">Light on</button>
+									<button onclick="turnLightsOff()">Light off</button>
+									<button onclick="turnSlenderOff()"> Slender Off</button>
+									<button onclick="turnSlenderOn()"> Slender On</button>
+									<button onclick="turnRainOff()">Turn rain off</button>
+									<button onclick="turnRainOn()">Turn rain on</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				  </div>		
@@ -45,7 +50,7 @@
 					<br /><br />
 					<span style="font-size:30px">Move: WASD<br/>
 					Look: MOUSE<br/>
-					E: COLLECT PAGE<br/>
+					E: INTERACT<br/>
 					Shift: RUN</span>
 				</div>
 			</div>

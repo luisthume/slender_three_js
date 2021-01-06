@@ -43,7 +43,7 @@
   right: 25px;
   font-family: "Syne Mono";
   font-size: 24px; 
-  visibility: hidden;
+  display: none;
 }
 
 
@@ -65,7 +65,7 @@
   -moz-animation: horror-animation 5s infinite;
   -o-animation: horror-animation 5s infinite;
   animation: horror-animation 5s infinite;
-  visibility: hidden;
+  display: none;
 }
 @-webkit-keyframes horror-animation {
   0% {
@@ -668,10 +668,21 @@
     }
 }
 
+:root {
+  --duration: 250ms;
+  --ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --font-family: "Syne Mono";
+  --font-size: 1.1rem;
+  --color-primary: rgba(255, 255, 255, 0.5);
+  --color-secondary: black;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --space: 1rem;
+}
+
 .dropdown {
   left: 10px;
   top: 10px;
-  width: 5%;
+  width: 10%;
   position: absolute;
   display: inline-block;
 }
@@ -693,7 +704,7 @@
   color: black;
   padding: 12px 16px;
   display: block;
-  font-size: 1.25rem;
+  font-size: var(--font-size);
   font-family: var(--font-family);
   text-transform: lowercase;
   text-shadow: var(--shadow) 2px 2px;
@@ -708,6 +719,34 @@
 }
 
 .dropdown:hover .dropbtn {
+  display: none;
+  background-color: var(--color-primary);
+}
+
+
+.dev-dropdown {
+  width: 100%;
+  position: relative;
+  display: inline-block;
+}
+
+.dev-dropdown-content {
+  top: 3px;
+  left: 10px;
+  display: none;
+  position: absolute;
+  background-color: var(--color-primary);
+  min-width: 160px;
+  box-shadow: var(--shadow) 3px 3px;
+  z-index: 1;
+  text-align:center;
+}
+
+.dev-dropdown:hover .dev-dropdown-content {
+  display: block;
+}
+
+.dev-dropdown:hover .dev-dropbtn {
   background-color: var(--color-primary);
 }
 
@@ -792,16 +831,6 @@ input[type=range]:focus::-ms-fill-upper {
   background: #b5b5b5;
 }
 
-:root {
-  --duration: 250ms;
-  --ease: cubic-bezier(0.215, 0.61, 0.355, 1);
-  --font-family: monospace;
-  --color-primary: rgba(255, 255, 255, 0.5);
-  --color-secondary: black;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --space: 1rem;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -824,7 +853,7 @@ input[type=range]:focus::-ms-fill-upper {
   border: var(--border-size) solid black;
   color: var(--color-secondary);
   background-color: var(--color-primary);
-  font-size: 1.2rem;
+  font-size: var(--font-size);
   font-family: var(--font-family);
   text-transform: lowercase;
   text-shadow: var(--shadow) 2px 2px;
